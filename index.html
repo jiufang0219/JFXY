@@ -3,7 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>九方星耀</title>
+  <title>九方星耀 · JF 0.0.12.12</title>
+  <!-- 开源简体中文正楷字体：霞鹜文楷 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <style>
+    /* 强制全局使用正楷字体 */
+    * { font-family: 'LXGW WenKai', 'KaiTi', '华文楷体', '楷体', 'Microsoft YaHei', serif !important; }
+    code, pre, .msg.ai code, .msg.ai pre { font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace !important; }
+  </style>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
   <meta name="theme-color" content="#ffffff">
   <style id="theme-style">
@@ -90,1384 +98,283 @@
       --save-btn-text: #b0e0d6;
       --save-btn-shadow: 0 0 0 2px #2f5f5a;
     }
-    /* ===== 全局重置 ===== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    }
-    *:focus { outline: none; }
-    * { -webkit-tap-highlight-color: transparent; }
-    body {
-      height: 100vh;
-      background: var(--bg-body);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      transition: background-color var(--transition-speed) ease;
-      overscroll-behavior: none;
-      position: relative;
-    }
-    .app {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      background: var(--bg-app);
-      transition: background-color var(--transition-speed) ease;
-    }
-    /* ===== 头部 ===== */
-    .header {
-      background: var(--bg-app);
-      color: var(--text-primary);
-      padding: 12px 20px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      box-shadow: 0 1px 2px var(--shadow-color);
-      transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-      flex-shrink: 0;
-    }
-    .header button {
-      background: transparent;
-      border: none;
-      color: var(--text-primary);
-      font-size: 1.4rem;
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), background 0.2s, color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.21);
-      -webkit-tap-highlight-color: transparent;
-    }
-    .header button:active {
-      background: var(--hover-bg);
-      transform: scale(0.94);
-      box-shadow: 0 2px 6px var(--shadow-color);
-    }
-    .header .title-container {
-      display: flex;
-      align-items: center;
-      flex: 1;
-      justify-content: center;
-      min-width: 0;
-    }
-    .header h1 {
-      font-size: 1.3rem;
-      font-weight: 600;
-      text-align: center;
-      color: var(--text-primary);
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      cursor: pointer;
-      margin: 0;
-      transition: color var(--transition-speed) ease;
-      width: 100%;
-    }
-    .header h1:active {
-      opacity: 0.7;
-    }
-    /* ===== 消息列表 ===== */
-    .messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px 0 20px 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      background: var(--bg-app);
-      scroll-behavior: auto;
-      -webkit-overflow-scrolling: touch;
-      position: relative;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      transition: background-color var(--transition-speed) ease;
-    }
-    .messages::-webkit-scrollbar {
-      display: none;
-    }
-    .empty-state {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      color: var(--text-secondary);
-      font-size: 1rem;
-      text-align: center;
-      padding: 20px;
-      transition: color var(--transition-speed) ease;
-    }
-    .empty-state img {
-      width: 110px;
-      height: auto;
-      margin-bottom: 16px;
-      opacity: 0.8;
-      transition: opacity var(--transition-speed) ease;
-    }
-    .empty-state p {
-      margin: 0;
-      line-height: 1.5;
-    }
-    .message-wrapper {
-      display: flex;
-      flex-direction: column;
-      position: relative;
-    }
-    .message-wrapper.user {
-      max-width: 85%;
-      align-self: flex-end;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      margin-right: 10px;
-    }
-    .message-wrapper.ai {
-      max-width: 100%;
-      width: 100%;
-      align-self: flex-start;
-    }
-    .msg {
-      padding: 12px 16px;
-      line-height: 1.5;
-      word-break: break-word;
-      white-space: pre-wrap;
-      animation: msgFadeIn 0.2s ease;
-      transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
-    }
-    .msg.user {
-      background: var(--user-msg-bg);
-      color: var(--user-msg-text);
-      border-radius: 14px;
-      border-bottom-right-radius: 4px;
-      box-shadow: 0 4px 10px var(--shadow-color);
-      font-size: 18px;
-      display: inline-block;
-      max-width: 100%;
-      width: fit-content;
-      word-break: break-word;
-      overflow-wrap: break-word;
-      margin: 0;
-    }
-    .msg.ai {
-      max-width: 100%;
-      width: 100%;
-      background: var(--ai-msg-bg);
-      border: none;
-      box-shadow: none;
-      color: var(--ai-msg-text);
-      padding: 12px 16px 8px 24px;
-      position: relative;
-      font-size: 19px;
-    }
-    .msg.ai::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 10px;
-      bottom: 40px;
-      width: 3px;
-      background-color: var(--ai-stripe);
-      border-radius: 2px;
-      pointer-events: none;
-      transition: background-color var(--transition-speed) ease;
-    }
-    .msg.ai * {
-      margin: 0;
-      padding: 0;
-      line-height: 1.5;
-    }
-    .msg.ai > :last-child,
-    .msg.ai *:last-child {
-      margin-bottom: 0 !important;
-    }
-    .msg.ai ul, .msg.ai ol {
-      padding-left: 20px;
-    }
-    .msg.ai li {
-      margin: 0;
-    }
-    .msg.ai p {
-      margin: 0 0 0.2em 0;
-    }
-    .msg.ai p:last-child {
-      margin-bottom: 0;
-    }
-    .msg.ai pre {
-      margin: 0 0 0.2em 0;
-      background: var(--btn-bg);
-      padding: 8px;
-      border-radius: 8px;
-      overflow-x: auto;
-      transition: background-color var(--transition-speed) ease;
-    }
-    .msg.ai pre:last-child {
-      margin-bottom: 0;
-    }
-    .msg.ai code {
-      background: var(--btn-bg);
-      padding: 2px 4px;
-      border-radius: 4px;
-      font-family: monospace;
-      transition: background-color var(--transition-speed) ease;
-    }
-    .msg.ai p:empty,
-    .msg.ai li:empty,
-    .msg.ai pre:empty {
-      display: none;
-    }
-    .msg.system {
-      align-self: center;
-      background: var(--system-bg);
-      color: var(--system-text);
-      font-size: 0.9rem;
-      padding: 8px 16px;
-      border-radius: 20px;
-      max-width: 80%;
-      text-align: center;
-      cursor: default;
-      box-shadow: 0 2px 6px var(--shadow-color);
-      transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-    }
-    .msg-time {
-      font-size: 0.7rem;
-      color: var(--text-secondary);
-      margin-top: 2px;
-      text-align: right;
-      opacity: 0.8;
-      transition: color var(--transition-speed) ease;
-    }
-    .message-wrapper.ai .msg-time {
-      text-align: left;
-    }
-    .retry-btn {
-      background: var(--btn-bg);
-      border: 1px solid var(--border-light);
-      border-radius: 20px;
-      padding: 6px 12px;
-      font-size: 0.8rem;
-      color: var(--btn-text);
-      cursor: pointer;
-      margin-top: 4px;
-      align-self: center;
-      box-shadow: 0 2px 6px var(--shadow-color);
-      transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-    }
-    .retry-btn:active {
-      background: var(--hover-bg);
-      transform: scale(0.96);
-    }
-    @keyframes msgFadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    /* ===== AI 思考加载动画 ===== */
-    .ai-loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      margin: 8px 0;
-      min-height: 100px;
-    }
-    #wifi-loader {
-      --front-color: #4f29f0;
-      --back-color: #c3c8de;
-      --text-color: var(--text-secondary);
-      width: 40px;
-      height: 40px;
-      border-radius: 50px;
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    #wifi-loader svg {
-      position: absolute;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      height: 100%;
-    }
-    #wifi-loader svg circle {
-      position: absolute;
-      fill: none;
-      stroke-width: 6px;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      transform: rotate(-100deg);
-      transform-origin: center;
-    }
-    #wifi-loader svg circle.back {
-      stroke: var(--back-color);
-    }
-    #wifi-loader svg circle.front {
-      stroke: var(--front-color);
-    }
-    #wifi-loader svg.circle-outer {
-      height: 54px;
-      width: 54px;
-    }
-    #wifi-loader svg.circle-outer circle {
-      stroke-dasharray: 62.75 188.25;
-    }
-    #wifi-loader svg.circle-outer circle.back {
-      animation: circle-outer135 1.8s ease infinite 0.3s;
-    }
-    #wifi-loader svg.circle-outer circle.front {
-      animation: circle-outer135 1.8s ease infinite 0.15s;
-    }
-    #wifi-loader svg.circle-middle {
-      height: 38px;
-      width: 38px;
-    }
-    #wifi-loader svg.circle-middle circle {
-      stroke-dasharray: 42.5 127.5;
-    }
-    #wifi-loader svg.circle-middle circle.back {
-      animation: circle-middle6123 1.8s ease infinite 0.25s;
-    }
-    #wifi-loader svg.circle-middle circle.front {
-      animation: circle-middle6123 1.8s ease infinite 0.1s;
-    }
-    #wifi-loader svg.circle-inner {
-      height: 22px;
-      width: 22px;
-    }
-    #wifi-loader svg.circle-inner circle {
-      stroke-dasharray: 22 66;
-    }
-    #wifi-loader svg.circle-inner circle.back {
-      animation: circle-inner162 1.8s ease infinite 0.2s;
-    }
-    #wifi-loader svg.circle-inner circle.front {
-      animation: circle-inner162 1.8s ease infinite 0.05s;
-    }
-    #wifi-loader .text {
-      position: absolute;
-      bottom: -40px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-transform: lowercase;
-      font-weight: 500;
-      font-size: 14px;
-      letter-spacing: 0.2px;
-      white-space: nowrap;
-      color: var(--text-color);
-    }
-    #wifi-loader .text::before,
-    #wifi-loader .text::after {
-      content: attr(data-text);
-    }
-    #wifi-loader .text::before {
-      color: var(--text-color);
-    }
-    #wifi-loader .text::after {
-      color: var(--front-color);
-      animation: text-animation76 3.6s ease infinite;
-      position: absolute;
-      left: 0;
-    }
-    @keyframes text-animation76 {
-      0% { clip-path: inset(0 100% 0 0); }
-      50% { clip-path: inset(0); }
-      100% { clip-path: inset(0 0 0 100%); }
-    }
-    @keyframes circle-outer135 {
-      0% { stroke-dashoffset: 25; }
-      25% { stroke-dashoffset: 0; }
-      65% { stroke-dashoffset: 301; }
-      80% { stroke-dashoffset: 276; }
-      100% { stroke-dashoffset: 276; }
-    }
-    @keyframes circle-middle6123 {
-      0% { stroke-dashoffset: 17; }
-      25% { stroke-dashoffset: 0; }
-      65% { stroke-dashoffset: 204; }
-      80% { stroke-dashoffset: 187; }
-      100% { stroke-dashoffset: 187; }
-    }
-    @keyframes circle-inner162 {
-      0% { stroke-dashoffset: 9; }
-      25% { stroke-dashoffset: 0; }
-      65% { stroke-dashoffset: 106; }
-      80% { stroke-dashoffset: 97; }
-      100% { stroke-dashoffset: 97; }
-    }
-    /* ===== 消息操作按钮 ===== */
-    .message-actions {
-      display: flex;
-      gap: 6px;
-      justify-content: flex-end;
-      margin-top: 4px;
-      opacity: 0;
-      transition: opacity 0.2s;
-      pointer-events: none;
-    }
-    .message-wrapper:hover .message-actions,
-    .message-wrapper .message-actions.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .action_btn {
-      --color: 0 0% 60%;
-      --color-has: 211deg 100% 48%;
-      --sz: 0.7rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: calc(var(--sz) * 2.5);
-      width: calc(var(--sz) * 2.5);
-      padding: 0.3rem 0.4rem;
-      border-radius: 0.375rem;
-      border: 0.0625rem solid hsl(var(--color));
-      background: transparent;
-      transition: border-color 0.2s;
-      color: var(--text-primary);
-    }
-    .action_btn:hover {
-      border-color: hsl(var(--color-has));
-    }
-    .action_btn:hover svg {
-      color: hsl(var(--color-has));
-    }
-    .action_btn svg {
-      overflow: visible;
-      height: calc(var(--sz) * 1.75);
-      width: calc(var(--sz) * 1.75);
-      --ease: cubic-bezier(0.5, 0, 0.25, 1);
-      --zoom-from: 1.75;
-      --zoom-via: 0.75;
-      --zoom-to: 1;
-      --duration: 1s;
-    }
-    .copy-btn:hover path[data-path="box"] {
-      transition: all 0.3s var(--ease);
-      animation: has-saved var(--duration) var(--ease) forwards;
-      fill: hsl(var(--color-has) / 0.35);
-    }
-    .copy-btn:hover path[data-path="line-top"] {
-      animation: has-saved-line-top var(--duration) var(--ease) forwards;
-    }
-    .copy-btn:hover path[data-path="line-bottom"] {
-      animation: has-saved-line-bottom var(--duration) var(--ease) forwards,
-                 has-saved-line-bottom-2 calc(var(--duration) * 1) var(--ease) calc(var(--duration) * 0.75);
-    }
-    .edit-btn:hover svg,
-    .delete-btn:hover svg {
-      animation: btn-pulse var(--duration) var(--ease) forwards;
-    }
-    @keyframes btn-pulse {
-      33.333% { transform: scale(var(--zoom-from)); }
-      66.666% { transform: scale(var(--zoom-via)); }
-      99.999% { transform: scale(var(--zoom-to)); }
-    }
-    @keyframes has-saved-line-top {
-      33.333% { transform: rotate(0deg) translate(1px, 2px) scale(var(--zoom-from)); d: path("M 3 5 L 3 8 L 3 8"); }
-      66.666% { transform: rotate(20deg) translate(2px, -2px) scale(var(--zoom-via)); }
-      99.999% { transform: rotate(0deg) translate(0px, 0px) scale(var(--zoom-to)); }
-    }
-    @keyframes has-saved-line-bottom {
-      33.333% { transform: rotate(0deg) translate(1px, 2px) scale(var(--zoom-from)); d: path("M 17 20 L 17 13 L 7 13 L 7 20"); }
-      66.666% { transform: rotate(20deg) translate(2px, -2px) scale(var(--zoom-via)); }
-      99.999% { transform: rotate(0deg) translate(0px, 0px) scale(var(--zoom-to)); d: path("M 17 21 L 17 21 L 7 21 L 7 21"); }
-    }
-    @keyframes has-saved-line-bottom-2 {
-      from { d: path("M 17 21 L 17 21 L 7 21 L 7 21"); }
-      to { transform: rotate(0deg) translate(0px, 0px) scale(var(--zoom-to)); d: path("M 17 20 L 17 13 L 7 13 L 7 20"); fill: white; }
-    }
-    @keyframes has-saved {
-      33.333% { transform: rotate(0deg) translate(1px, 2px) scale(var(--zoom-from)); }
-      66.666% { transform: rotate(20deg) translate(2px, -2px) scale(var(--zoom-via)); }
-      99.999% { transform: rotate(0deg) translate(0px, 0px) scale(var(--zoom-to)); }
-    }
-    .reasoning-block {
-      margin-top: 8px;
-      margin-bottom: 8px;
-      border-left: 3px solid var(--ai-stripe);
-      padding-left: 12px;
-      font-size: 19px;
-      color: var(--text-secondary);
-      opacity: 0.8;
-    }
-    .reasoning-header {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      cursor: pointer;
-      color: var(--text-secondary);
-      margin-bottom: 4px;
-      user-select: none;
-      font-size: 0.85rem;
-      opacity: 1;
-    }
-    .reasoning-header .toggle-icon {
-      font-size: 1.2rem;
-      line-height: 1;
-    }
-    .reasoning-content {
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-      max-height: 0;
-      font-size: 19px;
-      color: var(--text-secondary);
-      opacity: 0.8;
-    }
-    .reasoning-content.expanded {
-      max-height: none;
-    }
-    /* ===== 底部操作栏 ===== */
-    .bottom-bar {
-      flex-shrink: 0;
-      padding: 12px 8px 20px 8px;
-      background: transparent;
-    }
-    .input-card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(12px);
-      border-radius: 20px;
-      box-shadow: var(--glass-shadow);
-      padding: 16px 8px 16px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      border: 1px solid var(--border-light);
-      transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, border-color var(--transition-speed) ease;
-    }
-    .input-row {
-      display: flex;
-      gap: 10px;
-      align-items: flex-end;
-    }
-    .input-row textarea {
-      flex: 1;
-      background: var(--input-bg);
-      border: none;
-      border-radius: 0;
-      padding: 6px 0;
-      font-size: 1.4rem;
-      resize: none;
-      max-height: 150px;
-      overflow-y: auto;
-      line-height: 1.4;
-      color: var(--text-primary);
-      min-height: 38px;
-      transition: color var(--transition-speed) ease;
-    }
-    .input-row textarea:focus {
-      background: transparent;
-    }
-    .prompt-btn {
-      width: 40px;
-      height: 40px;
-      background: var(--glass-bg);
-      backdrop-filter: blur(12px);
-      color: var(--text-primary);
-      border: 1px solid var(--border-light);
-      font-size: 1.3rem;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: var(--glass-shadow);
-      cursor: pointer;
-      transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, transform 0.2s;
-      flex-shrink: 0;
-      margin-right: 4px;
-    }
-    .prompt-btn:active {
-      background: var(--hover-bg);
-      transform: scale(0.94);
-    }
-    .glass-radio-group {
-      display: flex;
-      position: relative;
-      background: var(--glass-bg);
-      backdrop-filter: blur(12px);
-      border-radius: 1rem;
-      box-shadow: var(--glass-shadow);
-      overflow: hidden;
-      width: fit-content;
-      height: 40px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .glass-radio-group input {
-      display: none;
-    }
-    .glass-radio-group label {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 90px;
-      font-size: 0.95rem;
-      padding: 0 12px;
-      cursor: pointer;
-      font-weight: 500;
-      letter-spacing: 0.3px;
-      color: var(--text-primary);
-      position: relative;
-      z-index: 2;
-      transition: color 0.3s ease-in-out;
-      white-space: nowrap;
-      height: 40px;
-      line-height: 40px;
-    }
-    .glass-radio-group label:hover {
-      color: var(--active-text);
-    }
-    .glass-radio-group input:checked + label {
-      color: #fff;
-    }
-    .glass-glider {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 50%;
-      border-radius: 1rem;
-      z-index: 1;
-      transition: transform 0.5s cubic-bezier(0.37, 1.95, 0.66, 0.56),
-                  background 0.4s ease-in-out,
-                  box-shadow 0.4s ease-in-out;
-    }
-    #fastModelRadio:checked ~ .glass-glider {
-      transform: translateX(0%);
-      background: var(--active-bg);
-      box-shadow: 0 0 18px var(--shadow-color);
-    }
-    #deepModelRadio:checked ~ .glass-glider {
-      transform: translateX(100%);
-      background: var(--active-bg);
-      box-shadow: 0 0 18px var(--shadow-color);
-    }
-    .send-btn {
-      width: 40px;
-      height: 40px;
-      padding: 0;
-      background: var(--glass-bg);
-      backdrop-filter: blur(12px);
-      color: var(--text-primary);
-      border: 1px solid var(--border-light);
-      font-size: 1.3rem;
-      min-width: 40px;
-      white-space: normal;
-      box-shadow: var(--glass-shadow);
-      margin-left: auto;
-      margin-right: 4px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
-      transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, transform 0.2s;
-      cursor: pointer;
-    }
-    .send-btn:active {
-      background: var(--hover-bg);
-      transform: scale(0.94);
-    }
-    .send-btn.stop {
-      background: #b91c1c;
-      color: white;
-    }
-    .model-row {
-      display: flex;
-      gap: 8px;
-      justify-content: flex-start;
-      flex-wrap: nowrap;
-      align-items: center;
-    }
-    /* ===== 侧边栏 ===== */
-    .menu-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: transparent;
-      z-index: 1999;
-      display: none;
-    }
-    .menu-overlay.show { display: block; }
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: -300px;
-      width: 280px;
-      height: 100%;
-      background: var(--sidebar-bg);
-      backdrop-filter: blur(2px);
-      box-shadow: 4px 0 24px var(--shadow-color);
-      transition: left 0.25s cubic-bezier(0.2, 0.9, 0.3, 1), background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-      z-index: 2000;
-      display: flex;
-      flex-direction: column;
-      padding: 20px 0;
-      border-right: 1px solid var(--border-light);
-      will-change: left;
-    }
-    .sidebar.open { left: 0; }
-    .sidebar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 20px 16px;
-      border-bottom: 1px solid var(--border-light);
-      transition: border-color var(--transition-speed) ease;
-    }
-    .sidebar-header h3 {
-      font-size: 1.2rem;
-      color: var(--text-primary);
-      font-weight: 600;
-      transition: color var(--transition-speed) ease;
-    }
-    .conversation-list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px;
-      -webkit-overflow-scrolling: touch;
-    }
-    .conv-item {
-      background: var(--btn-bg);
-      border-radius: 12px;
-      padding: 12px 16px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
-      border: 1px solid var(--border-light);
-      box-shadow: 0 2px 6px var(--shadow-color);
-      position: relative;
-      transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-    }
-    .conv-item:hover { background: var(--hover-bg); }
-    .conv-item.active {
-      background: var(--active-bg);
-      color: var(--active-text);
-      border-color: var(--active-bg);
-      box-shadow: 0 4px 12px var(--shadow-color);
-    }
-    .conv-item.active .conv-title {
-      color: var(--active-text);
-    }
-    .conv-title {
-      flex: 1;
-      font-weight: 500;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      cursor: pointer;
-      color: var(--text-primary);
-      transition: color var(--transition-speed) ease;
-    }
-    .conv-actions-popup {
-      position: absolute;
-      bottom: -150px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--card-bg);
-      border-radius: 20px;
-      box-shadow: 0 8px 24px var(--shadow-color);
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      padding: 12px;
-      z-index: 100;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s, bottom 0.2s, background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-      border: 1px solid var(--border-light);
-      min-width: 100px;
-    }
-    .conv-actions-popup.show {
-      opacity: 1;
-      pointer-events: auto;
-      bottom: -160px;
-    }
-    .conv-actions-popup button {
-      background: var(--btn-bg);
-      border: none;
-      color: var(--btn-text);
-      font-size: 0.9rem;
-      padding: 8px 12px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      width: 100%;
-      transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
-    }
-    .conv-actions-popup button:active {
-      background: var(--hover-bg);
-    }
-    .new-chat-btn {
-      margin: 16px 20px;
-      background: var(--active-bg);
-      color: var(--active-text);
-      border: none;
-      padding: 12px;
-      border-radius: 12px;
-      font-weight: 500;
-      font-size: 0.95rem;
-      cursor: pointer;
-      box-shadow: 0 8px 20px var(--shadow-color);
-      transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, transform 0.2s;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    *:focus { outline: none; } * { -webkit-tap-highlight-color: transparent; }
+    body { height: 100vh; background: var(--bg-body); display: flex; flex-direction: column; overflow: hidden; transition: background-color var(--transition-speed) ease; overscroll-behavior: none; position: relative; }
+    .app { height: 100%; display: flex; flex-direction: column; background: var(--bg-app); transition: background-color var(--transition-speed) ease; }
+    .header { background: var(--bg-app); color: var(--text-primary); padding: 12px 20px; display: flex; align-items: center; gap: 16px; box-shadow: 0 1px 2px var(--shadow-color); transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, box-shadow var(--transition-speed) ease; flex-shrink: 0; }
+    .header button { background: transparent; border: none; color: var(--text-primary); font-size: 1.4rem; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s cubic-bezier(0.23,1,0.32,1), background 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.21); -webkit-tap-highlight-color: transparent; }
+    .header button:active { background: var(--hover-bg); transform: scale(0.94); box-shadow: 0 2px 6px var(--shadow-color); }
+    .header .title-container { display: flex; align-items: center; flex: 1; justify-content: center; min-width: 0; }
+    .header h1 { font-size: 1.3rem; font-weight: 600; text-align: center; color: var(--text-primary); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; margin: 0; transition: color var(--transition-speed) ease; width: 100%; }
+    .header h1:active { opacity: 0.7; }
+    .messages { flex: 1; overflow-y: auto; padding: 20px 0 20px 8px; display: flex; flex-direction: column; gap: 12px; background: var(--bg-app); scroll-behavior: auto; -webkit-overflow-scrolling: touch; position: relative; scrollbar-width: none; -ms-overflow-style: none; transition: background-color var(--transition-speed) ease; }
+    .messages::-webkit-scrollbar { display: none; }
+    .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-secondary); font-size: 1rem; text-align: center; padding: 20px; transition: color var(--transition-speed) ease; }
+    .empty-state img { width: 110px; height: auto; margin-bottom: 16px; opacity: 0.8; transition: opacity var(--transition-speed) ease; }
+    .empty-state p { margin: 0; line-height: 1.5; }
+    .message-wrapper { display: flex; flex-direction: column; position: relative; }
+    .message-wrapper.user { max-width: 85%; align-self: flex-end; display: flex; flex-direction: column; align-items: flex-end; margin-right: 10px; }
+    .message-wrapper.ai { max-width: 100%; width: 100%; align-self: flex-start; }
+    .msg { padding: 12px 16px; line-height: 1.5; word-break: break-word; white-space: pre-wrap; animation: msgFadeIn 0.2s ease; transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease; }
+    .msg.user { background: var(--user-msg-bg); color: var(--user-msg-text); border-radius: 14px; border-bottom-right-radius: 4px; box-shadow: 0 4px 10px var(--shadow-color); font-size: 18px; display: inline-block; max-width: 100%; width: fit-content; word-break: break-word; overflow-wrap: break-word; margin: 0; }
+    .msg.ai { max-width: 100%; width: 100%; background: var(--ai-msg-bg); border: none; box-shadow: none; color: var(--ai-msg-text); padding: 12px 16px 8px 24px; position: relative; font-size: 19px; }
+    .msg.ai::before { content: ''; position: absolute; left: 0; top: 10px; bottom: 40px; width: 3px; background-color: var(--ai-stripe); border-radius: 2px; pointer-events: none; transition: background-color var(--transition-speed) ease; }
+    .msg.ai * { margin: 0; padding: 0; line-height: 1.5; }
+    .msg.ai > :last-child, .msg.ai *:last-child { margin-bottom: 0 !important; }
+    .msg.ai ul, .msg.ai ol { padding-left: 20px; } .msg.ai li { margin: 0; } .msg.ai p { margin: 0 0 0.2em 0; } .msg.ai p:last-child { margin-bottom: 0; }
+    .msg.ai pre { margin: 0 0 0.2em 0; background: var(--btn-bg); padding: 8px; border-radius: 8px; overflow-x: auto; transition: background-color var(--transition-speed) ease; }
+    .msg.ai pre:last-child { margin-bottom: 0; } .msg.ai code { background: var(--btn-bg); padding: 2px 4px; border-radius: 4px; transition: background-color var(--transition-speed) ease; }
+    .msg.ai p:empty, .msg.ai li:empty, .msg.ai pre:empty { display: none; }
+    .msg.system { align-self: center; background: var(--system-bg); color: var(--system-text); font-size: 0.9rem; padding: 8px 16px; border-radius: 20px; max-width: 80%; text-align: center; cursor: default; box-shadow: 0 2px 6px var(--shadow-color); transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, box-shadow var(--transition-speed) ease; }
+    .msg-time { font-size: 0.7rem; color: var(--text-secondary); margin-top: 2px; text-align: right; opacity: 0.8; transition: color var(--transition-speed) ease; }
+    .message-wrapper.ai .msg-time { text-align: left; }
+    .retry-btn { background: var(--btn-bg); border: 1px solid var(--border-light); border-radius: 20px; padding: 6px 12px; font-size: 0.8rem; color: var(--btn-text); cursor: pointer; margin-top: 4px; align-self: center; box-shadow: 0 2px 6px var(--shadow-color); transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease; }
+    .retry-btn:active { background: var(--hover-bg); transform: scale(0.96); }
+    @keyframes msgFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .ai-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; margin: 8px 0; min-height: 100px; }
+    #wifi-loader { --front-color: #4f29f0; --back-color: #c3c8de; --text-color: var(--text-secondary); width: 40px; height: 40px; border-radius: 50px; position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 8px; }
+    #wifi-loader svg { position: absolute; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
+    #wifi-loader svg circle { position: absolute; fill: none; stroke-width: 6px; stroke-linecap: round; stroke-linejoin: round; transform: rotate(-100deg); transform-origin: center; }
+    #wifi-loader svg circle.back { stroke: var(--back-color); } #wifi-loader svg circle.front { stroke: var(--front-color); }
+    #wifi-loader svg.circle-outer { height: 54px; width: 54px; } #wifi-loader svg.circle-outer circle { stroke-dasharray: 62.75 188.25; }
+    #wifi-loader svg.circle-outer circle.back { animation: circle-outer135 1.8s ease infinite 0.3s; } #wifi-loader svg.circle-outer circle.front { animation: circle-outer135 1.8s ease infinite 0.15s; }
+    #wifi-loader svg.circle-middle { height: 38px; width: 38px; } #wifi-loader svg.circle-middle circle { stroke-dasharray: 42.5 127.5; }
+    #wifi-loader svg.circle-middle circle.back { animation: circle-middle6123 1.8s ease infinite 0.25s; } #wifi-loader svg.circle-middle circle.front { animation: circle-middle6123 1.8s ease infinite 0.1s; }
+    #wifi-loader svg.circle-inner { height: 22px; width: 22px; } #wifi-loader svg.circle-inner circle { stroke-dasharray: 22 66; }
+    #wifi-loader svg.circle-inner circle.back { animation: circle-inner162 1.8s ease infinite 0.2s; } #wifi-loader svg.circle-inner circle.front { animation: circle-inner162 1.8s ease infinite 0.05s; }
+    #wifi-loader .text { position: absolute; bottom: -40px; display: flex; justify-content: center; align-items: center; text-transform: lowercase; font-weight: 500; font-size: 14px; letter-spacing: 0.2px; white-space: nowrap; color: var(--text-color); }
+    #wifi-loader .text::before, #wifi-loader .text::after { content: attr(data-text); } #wifi-loader .text::before { color: var(--text-color); }
+    #wifi-loader .text::after { color: var(--front-color); animation: text-animation76 3.6s ease infinite; position: absolute; left: 0; }
+    @keyframes text-animation76 { 0% { clip-path: inset(0 100% 0 0); } 50% { clip-path: inset(0); } 100% { clip-path: inset(0 0 0 100%); } }
+    @keyframes circle-outer135 { 0% { stroke-dashoffset: 25; } 25% { stroke-dashoffset: 0; } 65% { stroke-dashoffset: 301; } 80% { stroke-dashoffset: 276; } 100% { stroke-dashoffset: 276; } }
+    @keyframes circle-middle6123 { 0% { stroke-dashoffset: 17; } 25% { stroke-dashoffset: 0; } 65% { stroke-dashoffset: 204; } 80% { stroke-dashoffset: 187; } 100% { stroke-dashoffset: 187; } }
+    @keyframes circle-inner162 { 0% { stroke-dashoffset: 9; } 25% { stroke-dashoffset: 0; } 65% { stroke-dashoffset: 106; } 80% { stroke-dashoffset: 97; } 100% { stroke-dashoffset: 97; } }
+    .message-actions { display: flex; gap: 6px; justify-content: flex-end; margin-top: 4px; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+    .message-wrapper:hover .message-actions, .message-wrapper .message-actions.show { opacity: 1; pointer-events: auto; }
+    .action_btn { --color: 0 0% 60%; --color-has: 211deg 100% 48%; --sz: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; height: calc(var(--sz) * 2.5); width: calc(var(--sz) * 2.5); padding: 0.3rem 0.4rem; border-radius: 0.375rem; border: 0.0625rem solid hsl(var(--color)); background: transparent; transition: border-color 0.2s; color: var(--text-primary); }
+    .action_btn:hover { border-color: hsl(var(--color-has)); } .action_btn:hover svg { color: hsl(var(--color-has)); }
+    .action_btn svg { overflow: visible; height: calc(var(--sz) * 1.75); width: calc(var(--sz) * 1.75); --ease: cubic-bezier(0.5,0,0.25,1); --zoom-from: 1.75; --zoom-via: 0.75; --zoom-to: 1; --duration: 1s; }
+    .copy-btn:hover path[data-path="box"] { transition: all 0.3s var(--ease); animation: has-saved var(--duration) var(--ease) forwards; fill: hsl(var(--color-has) / 0.35); }
+    .copy-btn:hover path[data-path="line-top"] { animation: has-saved-line-top var(--duration) var(--ease) forwards; }
+    .copy-btn:hover path[data-path="line-bottom"] { animation: has-saved-line-bottom var(--duration) var(--ease) forwards, has-saved-line-bottom-2 calc(var(--duration) * 1) var(--ease) calc(var(--duration) * 0.75); }
+    .edit-btn:hover svg, .delete-btn:hover svg { animation: btn-pulse var(--duration) var(--ease) forwards; }
+    @keyframes btn-pulse { 33.333% { transform: scale(var(--zoom-from)); } 66.666% { transform: scale(var(--zoom-via)); } 99.999% { transform: scale(var(--zoom-to)); } }
+    @keyframes has-saved-line-top { 33.333% { transform: rotate(0deg) translate(1px,2px) scale(var(--zoom-from)); d: path("M 3 5 L 3 8 L 3 8"); } 66.666% { transform: rotate(20deg) translate(2px,-2px) scale(var(--zoom-via)); } 99.999% { transform: rotate(0deg) translate(0px,0px) scale(var(--zoom-to)); } }
+    @keyframes has-saved-line-bottom { 33.333% { transform: rotate(0deg) translate(1px,2px) scale(var(--zoom-from)); d: path("M 17 20 L 17 13 L 7 13 L 7 20"); } 66.666% { transform: rotate(20deg) translate(2px,-2px) scale(var(--zoom-via)); } 99.999% { transform: rotate(0deg) translate(0px,0px) scale(var(--zoom-to)); d: path("M 17 21 L 17 21 L 7 21 L 7 21"); } }
+    @keyframes has-saved-line-bottom-2 { from { d: path("M 17 21 L 17 21 L 7 21 L 7 21"); } to { transform: rotate(0deg) translate(0px,0px) scale(var(--zoom-to)); d: path("M 17 20 L 17 13 L 7 13 L 7 20"); fill: white; } }
+    @keyframes has-saved { 33.333% { transform: rotate(0deg) translate(1px,2px) scale(var(--zoom-from)); } 66.666% { transform: rotate(20deg) translate(2px,-2px) scale(var(--zoom-via)); } 99.999% { transform: rotate(0deg) translate(0px,0px) scale(var(--zoom-to)); } }
+    .reasoning-block { margin-top: 8px; margin-bottom: 8px; border-left: 3px solid var(--ai-stripe); padding-left: 12px; font-size: 19px; color: var(--text-secondary); opacity: 0.8; }
+    .reasoning-header { display: flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text-secondary); margin-bottom: 4px; user-select: none; font-size: 0.85rem; opacity: 1; }
+    .reasoning-header .toggle-icon { font-size: 1.2rem; line-height: 1; }
+    .reasoning-content { overflow: hidden; transition: max-height 0.3s ease; max-height: 0; font-size: 19px; color: var(--text-secondary); opacity: 0.8; }
+    .reasoning-content.expanded { max-height: none; }
+    .bottom-bar { flex-shrink: 0; padding: 12px 8px 20px 8px; background: transparent; }
+    .input-card { background: var(--glass-bg); backdrop-filter: blur(12px); border-radius: 20px; box-shadow: var(--glass-shadow); padding: 16px 8px 16px 16px; display: flex; flex-direction: column; gap: 12px; border: 1px solid var(--border-light); transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, border-color var(--transition-speed) ease; }
+    .input-row { display: flex; gap: 10px; align-items: flex-end; }
+    .input-row textarea { flex: 1; background: var(--input-bg); border: none; border-radius: 0; padding: 6px 0; font-size: 1.4rem; resize: none; max-height: 150px; overflow-y: auto; line-height: 1.4; color: var(--text-primary); min-height: 38px; transition: color var(--transition-speed) ease; }
+    .input-row textarea:focus { background: transparent; }
+    .prompt-btn { width: 40px; height: 40px; background: var(--glass-bg); backdrop-filter: blur(12px); color: var(--text-primary); border: 1px solid var(--border-light); font-size: 1.3rem; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: var(--glass-shadow); cursor: pointer; transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, transform 0.2s; flex-shrink: 0; margin-right: 4px; }
+    .prompt-btn:active { background: var(--hover-bg); transform: scale(0.94); }
+    .glass-radio-group { display: flex; position: relative; background: var(--glass-bg); backdrop-filter: blur(12px); border-radius: 1rem; box-shadow: var(--glass-shadow); overflow: hidden; width: fit-content; height: 40px; border: 1px solid rgba(255,255,255,0.1); }
+    .glass-radio-group input { display: none; }
+    .glass-radio-group label { flex: 1; display: flex; align-items: center; justify-content: center; min-width: 90px; font-size: 0.95rem; padding: 0 12px; cursor: pointer; font-weight: 500; letter-spacing: 0.3px; color: var(--text-primary); position: relative; z-index: 2; transition: color 0.3s ease-in-out; white-space: nowrap; height: 40px; line-height: 40px; }
+    .glass-radio-group label:hover { color: var(--active-text); } .glass-radio-group input:checked + label { color: #fff; }
+    .glass-glider { position: absolute; top: 0; bottom: 0; width: 50%; border-radius: 1rem; z-index: 1; transition: transform 0.5s cubic-bezier(0.37,1.95,0.66,0.56), background 0.4s ease-in-out, box-shadow 0.4s ease-in-out; }
+    #fastModelRadio:checked ~ .glass-glider { transform: translateX(0%); background: var(--active-bg); box-shadow: 0 0 18px var(--shadow-color); }
+    #deepModelRadio:checked ~ .glass-glider { transform: translateX(100%); background: var(--active-bg); box-shadow: 0 0 18px var(--shadow-color); }
+    .send-btn { width: 40px; height: 40px; padding: 0; background: var(--glass-bg); backdrop-filter: blur(12px); color: var(--text-primary); border: 1px solid var(--border-light); font-size: 1.3rem; min-width: 40px; white-space: normal; box-shadow: var(--glass-shadow); margin-left: auto; margin-right: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; line-height: 1; transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, transform 0.2s; cursor: pointer; }
+    .send-btn:active { background: var(--hover-bg); transform: scale(0.94); } .send-btn.stop { background: #b91c1c; color: white; }
+    .model-row { display: flex; gap: 8px; justify-content: flex-start; flex-wrap: nowrap; align-items: center; }
+    .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: transparent; z-index: 1999; display: none; } .menu-overlay.show { display: block; }
+    .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: var(--sidebar-bg); backdrop-filter: blur(2px); box-shadow: 4px 0 24px var(--shadow-color); transition: left 0.25s cubic-bezier(0.2,0.9,0.3,1), background-color var(--transition-speed) ease; z-index: 2000; display: flex; flex-direction: column; padding: 20px 0; border-right: 1px solid var(--border-light); will-change: left; }
+    .sidebar.open { left: 0; } .sidebar-header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px 16px; border-bottom: 1px solid var(--border-light); transition: border-color var(--transition-speed) ease; }
+    .sidebar-header h3 { font-size: 1.2rem; color: var(--text-primary); font-weight: 600; transition: color var(--transition-speed) ease; }
+    .conversation-list { flex: 1; overflow-y: auto; padding: 12px; -webkit-overflow-scrolling: touch; }
+    .conv-item { background: var(--btn-bg); border-radius: 12px; padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: 1px solid var(--border-light); box-shadow: 0 2px 6px var(--shadow-color); position: relative; transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease; }
+    .conv-item:hover { background: var(--hover-bg); } .conv-item.active { background: var(--active-bg); color: var(--active-text); border-color: var(--active-bg); box-shadow: 0 4px 12px var(--shadow-color); } .conv-item.active .conv-title { color: var(--active-text); }
+    .conv-title { flex: 1; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; color: var(--text-primary); transition: color var(--transition-speed) ease; }
+    .conv-actions-popup { position: absolute; bottom: -150px; left: 50%; transform: translateX(-50%); background: var(--card-bg); border-radius: 20px; box-shadow: 0 8px 24px var(--shadow-color); display: flex; flex-direction: column; gap: 4px; padding: 12px; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s, bottom 0.2s; border: 1px solid var(--border-light); min-width: 100px; }
+    .conv-actions-popup.show { opacity: 1; pointer-events: auto; bottom: -160px; }
+    .conv-actions-popup button { background: var(--btn-bg); border: none; color: var(--btn-text); font-size: 0.9rem; padding: 8px 12px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; width: 100%; transition: background-color var(--transition-speed) ease; }
+    .conv-actions-popup button:active { background: var(--hover-bg); }
+    .new-chat-btn { margin: 16px 20px; background: var(--active-bg); color: var(--active-text); border: none; padding: 12px; border-radius: 12px; font-weight: 500; font-size: 0.95rem; cursor: pointer; box-shadow: 0 8px 20px var(--shadow-color); transition: background-color var(--transition-speed) ease, transform 0.2s; }
     .new-chat-btn:active { transform: scale(0.97); background: var(--hover-bg); }
-    /* ===== 设置面板 ===== */
-    .settings-panel {
-      position: fixed;
-      top: 0;
-      right: -400px;
-      width: 90%;
-      max-width: 400px;
-      height: 100%;
-      background: var(--sidebar-bg);
-      backdrop-filter: blur(2px);
-      box-shadow: -4px 0 24px var(--shadow-color);
-      transition: right 0.25s cubic-bezier(0.2, 0.9, 0.3, 1), background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-      z-index: 1000;
-      overflow-y: auto;
-      padding: 24px 20px;
-      display: flex;
-      flex-direction: column;
-      border-left: 1px solid var(--border-light);
-      will-change: right;
-    }
-    .settings-panel.open { right: 0; }
-    .settings-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
-    .settings-header h2 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      transition: color var(--transition-speed) ease;
-    }
-    .close-btn {
-      background: transparent;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-primary);
-      box-shadow: 0 4px 12px var(--shadow-color);
-      transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-      padding: 0;
-      margin: 0;
-      text-align: center;
-      line-height: 1;
-    }
-    .close-btn:active {
-      background: var(--hover-bg);
-      transform: scale(0.96);
-    }
-    .setting-row {
-      margin-bottom: 20px;
-    }
-    .setting-row label {
-      font-weight: 500;
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      display: block;
-      margin-bottom: 4px;
-      letter-spacing: 0.3px;
-      transition: color var(--transition-speed) ease;
-    }
-    .setting-row input,
-    .setting-row select,
-    .setting-row textarea {
-      width: 100%;
-      padding: 10px 14px;
-      border: 1px solid var(--border-light);
-      border-radius: 10px;
-      font-size: 0.9rem;
-      background: var(--btn-bg);
-      color: var(--text-primary);
-      box-shadow: inset 0 1px 3px var(--shadow-color);
-      transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-    }
-    .setting-row input:focus,
-    .setting-row select:focus,
-    .setting-row textarea:focus {
-      border-color: var(--active-bg);
-      box-shadow: 0 0 0 2px rgba(26,26,26,0.1);
-    }
-    .setting-row textarea {
-      border-radius: 10px;
-      min-height: 120px;
-      height: 120px;
-      resize: vertical;
-    }
-    .row-flex {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .row-flex > * { flex: 1 1 120px; }
-    .model-refresh-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    .model-refresh-btn {
-      background: var(--btn-bg);
-      border: 1px solid var(--border-light);
-      border-radius: 20px;
-      padding: 6px 12px;
-      font-size: 0.85rem;
-      color: var(--btn-text);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-    }
-    .model-refresh-btn:active {
-      background: var(--hover-bg);
-    }
-    /* ===== 统一开关样式 ===== */
-    .switch-button {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 24px;
-    }
-    .switch-button .switch-outer {
-      height: 100%;
-      width: 52px;
-      border-radius: 165px;
-      padding: 2px;
-      box-sizing: border-box;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      position: relative;
-      background: var(--switch-bg);
-      border: 1px solid var(--switch-border);
-      box-shadow: var(--switch-shadow);
-    }
-    .switch-button .switch-outer input[type="checkbox"] {
-      opacity: 0;
-      width: 0;
-      height: 0;
-      position: absolute;
-    }
-    .switch-button .switch-outer .button-toggle {
-      height: 20px;
-      width: 20px;
-      background: var(--switch-toggle-bg);
-      border-radius: 100%;
-      box-shadow: var(--switch-toggle-shadow);
-      position: relative;
-      z-index: 2;
-      transition: left 0.3s ease-in;
-      left: 0;
-    }
-    .switch-button .switch-outer input[type="checkbox"]:checked + .button .button-toggle {
-      left: 58%;
-    }
-    .switch-button .switch-outer input[type="checkbox"]:checked + .button .button-indicator {
-      animation: indicator 1s forwards;
-    }
-    .switch-button .switch-outer .button {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      position: relative;
-      justify-content: space-between;
-    }
-    .switch-button .switch-outer .button-indicator {
-      height: 12px;
-      width: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      border-radius: 50%;
-      border: 2px solid var(--switch-indicator-off);
-      box-sizing: border-box;
-      right: 4px;
-      position: relative;
-    }
-    .switch-button .switch-outer input[type="checkbox"]:checked + .button .button-indicator {
-      border-color: var(--switch-indicator-on);
-      left: -68%;
-    }
-    @keyframes indicator {
-      30% { opacity: 0; }
-      0% { opacity: 1; }
-      100% { opacity: 1; }
-    }
-    /* 双列布局容器 */
-    .switch-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .switch-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      background: var(--btn-bg);
-      padding: 8px 10px;
-      border-radius: 12px;
-      border: 1px solid var(--border-light);
-      flex-wrap: nowrap;
-    }
-    .switch-item label:first-child {
-      font-weight: 500;
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      white-space: nowrap;
-      flex-shrink: 1;
-    }
-    .switch-button {
-      flex-shrink: 0;
-    }
-    @media (max-width: 500px) {
-      .switch-grid {
-        grid-template-columns: 1fr;
-      }
-      .prompt-modal-content .switch-group {
-        grid-template-columns: 1fr !important;
-      }
-    }
-    /* ===== 保存设置按钮 ===== */
-    .save-btn-container {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-    }
-    .animated-button {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 300px;
-      padding: 12px 20px;
-      border: 4px solid transparent;
-      font-size: 1.25rem;
-      background-color: var(--save-btn-bg);
-      border-radius: 100px;
-      font-weight: 600;
-      color: var(--save-btn-text);
-      box-shadow: var(--save-btn-shadow);
-      cursor: pointer;
-      overflow: hidden;
-      transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-      letter-spacing: 1px;
-      outline: none;
-      border: none;
-    }
-    .animated-button svg {
-      position: absolute;
-      width: 26px;
-      fill: var(--save-btn-text);
-      z-index: 9;
-      transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-    }
-    .animated-button .arr-1 {
-      right: 16px;
-    }
-    .animated-button .arr-2 {
-      left: -25%;
-    }
-    .animated-button .circle {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 20px;
-      height: 20px;
-      background-color: #b3e6da;
-      border-radius: 50%;
-      opacity: 0;
-      transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-    }
-    .animated-button .text {
-      position: relative;
-      z-index: 1;
-      transform: translateX(-12px);
-      transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-      white-space: nowrap;
-    }
-    .animated-button:hover {
-      box-shadow: 0 0 0 12px transparent;
-      color: #1a3b37;
-      border-radius: 12px;
-    }
-    .animated-button:hover .arr-1 {
-      right: -25%;
-    }
-    .animated-button:hover .arr-2 {
-      left: 16px;
-    }
-    .animated-button:hover .text {
-      transform: translateX(12px);
-    }
-    .animated-button:hover svg {
-      fill: #1a3b37;
-    }
-    .animated-button:active {
-      scale: 0.95;
-      box-shadow: 0 0 0 4px #7ed9c5;
-    }
-    .animated-button:hover .circle {
-      width: 280px;
-      height: 280px;
-      opacity: 1;
-    }
-    .animated-button.success {
-      background-color: #b3e6da;
-      color: #0f3d38;
-    }
-    .animated-button.success svg {
-      fill: #0f3d38;
-    }
-    .settings-footer-note {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      text-align: center;
-      margin-top: 12px;
-      transition: color var(--transition-speed) ease;
-    }
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: transparent;
-      z-index: 999;
-      display: none;
-    }
-    .overlay.show { display: block; }
-    datalist { display: none; }
-    /* ===== 模态框样式 ===== */
-    .edit-modal, .title-modal, .prompt-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.2);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 3000;
-      backdrop-filter: blur(2px);
-    }
-    .edit-modal.show, .title-modal.show, .prompt-modal.show {
-      display: flex;
-    }
-    .edit-modal-content, .title-modal-content, .prompt-modal-content {
-      background: var(--card-bg);
-      width: 90%;
-      max-width: 500px;
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 20px 40px var(--shadow-color);
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-    :root.dark-theme .edit-modal-content h3,
-    :root.dark-theme .title-modal-content h3,
-    :root.dark-theme .prompt-modal-content h3 {
-      color: var(--text-primary);
-    }
-    .edit-modal-content textarea,
-    .title-modal-content input {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid var(--border-light);
-      border-radius: 12px;
-      font-size: 1.2rem;
-      resize: vertical;
-      margin-bottom: 16px;
-      background: var(--btn-bg);
-      color: var(--text-primary);
-    }
-    .edit-modal-content textarea {
-      min-height: 200px;
-    }
-    .prompt-modal-content .param-row {
-      margin-bottom: 12px;
-      width: 100%;
-    }
-    .prompt-modal-content .param-row label {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      display: block;
-      margin-bottom: 2px;
-    }
-    .prompt-modal-content .param-row input,
-    .prompt-modal-content .param-row textarea {
-      width: 100%;
-      padding: 8px 10px;
-      border: 1px solid var(--border-light);
-      border-radius: 8px;
-      background: var(--btn-bg);
-      color: var(--text-primary);
-      font-size: 1rem;
-    }
-    .prompt-modal-content .param-row textarea {
-      min-height: 100px;
-    }
-    .prompt-modal-content .switch-group {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    .prompt-modal-content .switch-group .switch-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--btn-bg);
-      padding: 8px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border-light);
-      flex-wrap: nowrap;
-    }
-    .prompt-modal-content .switch-group .switch-item label:first-child {
-      font-weight: 500;
-      font-size: 0.9rem;
-      color: var(--text-primary);
-      white-space: nowrap;
-    }
-    .prompt-modal-content .row-flex {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-    .prompt-modal-content .row-flex > * {
-      flex: 1 1 120px;
-    }
-    .prompt-modal-content h3 {
-      font-size: 1.2rem;
-      margin-bottom: 16px;
-    }
-    .edit-modal-buttons, .title-modal-buttons, .prompt-modal-buttons {
-      display: flex;
-      gap: 12px;
-      justify-content: flex-end;
-    }
-    .title-modal-buttons, .prompt-modal-buttons {
-      justify-content: center;
-    }
-    .edit-modal-buttons button, .title-modal-buttons button, .prompt-modal-buttons button {
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-weight: 500;
-      cursor: pointer;
-      box-shadow: 0 2px 6px var(--shadow-color);
-    }
-    .edit-save, .title-save, .prompt-save {
-      background: var(--active-bg);
-      color: var(--active-text);
-      border: none;
-    }
+    .settings-panel { position: fixed; top: 0; right: -400px; width: 90%; max-width: 400px; height: 100%; background: var(--sidebar-bg); backdrop-filter: blur(2px); box-shadow: -4px 0 24px var(--shadow-color); transition: right 0.25s cubic-bezier(0.2,0.9,0.3,1), background-color var(--transition-speed) ease; z-index: 1000; overflow-y: auto; padding: 24px 20px; display: flex; flex-direction: column; border-left: 1px solid var(--border-light); will-change: right; }
+    .settings-panel.open { right: 0; } .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .settings-header h2 { font-size: 1.5rem; font-weight: 600; color: var(--text-primary); transition: color var(--transition-speed) ease; }
+    .close-btn { background: transparent; border: none; font-size: 1.5rem; cursor: pointer; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--text-primary); box-shadow: 0 4px 12px var(--shadow-color); transition: background-color var(--transition-speed) ease; }
+    .close-btn:active { background: var(--hover-bg); transform: scale(0.96); }
+    .setting-row { margin-bottom: 20px; } .setting-row label { font-weight: 500; font-size: 0.85rem; color: var(--text-secondary); display: block; margin-bottom: 4px; letter-spacing: 0.3px; transition: color var(--transition-speed) ease; }
+    .setting-row input, .setting-row select, .setting-row textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border-light); border-radius: 10px; font-size: 0.9rem; background: var(--btn-bg); color: var(--text-primary); box-shadow: inset 0 1px 3px var(--shadow-color); transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease; }
+    .setting-row input:focus, .setting-row select:focus, .setting-row textarea:focus { border-color: var(--active-bg); box-shadow: 0 0 0 2px rgba(26,26,26,0.1); }
+    .setting-row textarea { border-radius: 10px; min-height: 120px; height: 120px; resize: vertical; }
+    .row-flex { display: flex; gap: 12px; flex-wrap: wrap; } .row-flex > * { flex: 1 1 120px; }
+    .model-refresh-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .model-refresh-btn { background: var(--btn-bg); border: 1px solid var(--border-light); border-radius: 20px; padding: 6px 12px; font-size: 0.85rem; color: var(--btn-text); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: background-color var(--transition-speed) ease; }
+    .model-refresh-btn:active { background: var(--hover-bg); }
+    .switch-button { display: flex; align-items: center; justify-content: center; height: 24px; }
+    .switch-button .switch-outer { height: 100%; width: 52px; border-radius: 165px; padding: 2px; box-sizing: border-box; cursor: pointer; -webkit-tap-highlight-color: transparent; position: relative; background: var(--switch-bg); border: 1px solid var(--switch-border); box-shadow: var(--switch-shadow); }
+    .switch-button .switch-outer input[type="checkbox"] { opacity: 0; width: 0; height: 0; position: absolute; }
+    .switch-button .switch-outer .button-toggle { height: 20px; width: 20px; background: var(--switch-toggle-bg); border-radius: 100%; box-shadow: var(--switch-toggle-shadow); position: relative; z-index: 2; transition: left 0.3s ease-in; left: 0; }
+    .switch-button .switch-outer input[type="checkbox"]:checked + .button .button-toggle { left: 58%; }
+    .switch-button .switch-outer input[type="checkbox"]:checked + .button .button-indicator { animation: indicator 1s forwards; }
+    .switch-button .switch-outer .button { width: 100%; height: 100%; display: flex; position: relative; justify-content: space-between; }
+    .switch-button .switch-outer .button-indicator { height: 12px; width: 12px; top: 50%; transform: translateY(-50%); border-radius: 50%; border: 2px solid var(--switch-indicator-off); box-sizing: border-box; right: 4px; position: relative; }
+    .switch-button .switch-outer input[type="checkbox"]:checked + .button .button-indicator { border-color: var(--switch-indicator-on); left: -68%; }
+    @keyframes indicator { 30% { opacity: 0; } 0% { opacity: 1; } 100% { opacity: 1; } }
+    .switch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .switch-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--btn-bg); padding: 8px 10px; border-radius: 12px; border: 1px solid var(--border-light); flex-wrap: nowrap; }
+    .switch-item label:first-child { font-weight: 500; font-size: 0.85rem; color: var(--text-secondary); white-space: nowrap; flex-shrink: 1; }
+    .switch-button { flex-shrink: 0; }
+    @media (max-width: 500px) { .switch-grid { grid-template-columns: 1fr; } .prompt-modal-content .switch-group { grid-template-columns: 1fr !important; } }
+    .save-btn-container { display: flex; justify-content: center; margin-top: 20px; }
+    .animated-button { position: relative; display: flex; align-items: center; justify-content: center; width: 300px; padding: 12px 20px; border: none; font-size: 1.25rem; background-color: var(--save-btn-bg); border-radius: 100px; font-weight: 600; color: var(--save-btn-text); box-shadow: var(--save-btn-shadow); cursor: pointer; overflow: hidden; transition: all 0.6s cubic-bezier(0.23,1,0.32,1); letter-spacing: 1px; }
+    .animated-button svg { position: absolute; width: 26px; fill: var(--save-btn-text); z-index: 9; transition: all 0.8s cubic-bezier(0.23,1,0.32,1); }
+    .animated-button .arr-1 { right: 16px; } .animated-button .arr-2 { left: -25%; }
+    .animated-button .circle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; background-color: #b3e6da; border-radius: 50%; opacity: 0; transition: all 0.8s cubic-bezier(0.23,1,0.32,1); }
+    .animated-button .text { position: relative; z-index: 1; transform: translateX(-12px); transition: all 0.8s cubic-bezier(0.23,1,0.32,1); white-space: nowrap; }
+    .animated-button:hover { box-shadow: 0 0 0 12px transparent; color: #1a3b37; border-radius: 12px; }
+    .animated-button:hover .arr-1 { right: -25%; } .animated-button:hover .arr-2 { left: 16px; } .animated-button:hover .text { transform: translateX(12px); }
+    .animated-button:hover svg { fill: #1a3b37; } .animated-button:active { scale: 0.95; box-shadow: 0 0 0 4px #7ed9c5; }
+    .animated-button:hover .circle { width: 280px; height: 280px; opacity: 1; }
+    .animated-button.success { background-color: #b3e6da; color: #0f3d38; } .animated-button.success svg { fill: #0f3d38; }
+    .settings-footer-note { font-size: 0.75rem; color: var(--text-secondary); text-align: center; margin-top: 12px; transition: color var(--transition-speed) ease; }
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: transparent; z-index: 999; display: none; } .overlay.show { display: block; }
+    .edit-modal, .title-modal, .prompt-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.2); display: none; align-items: center; justify-content: center; z-index: 3000; backdrop-filter: blur(2px); }
+    .edit-modal.show, .title-modal.show, .prompt-modal.show { display: flex; }
+    .edit-modal-content, .title-modal-content, .prompt-modal-content { background: var(--card-bg); width: 90%; max-width: 500px; border-radius: 20px; padding: 24px; box-shadow: 0 20px 40px var(--shadow-color); max-height: 80vh; overflow-y: auto; }
+    .edit-modal-content h3, .title-modal-content h3, .prompt-modal-content h3 { font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 28px; text-align: center; }
+    .edit-modal-content textarea, .title-modal-content input { width: 100%; padding: 14px; border: 1px solid var(--border-light); border-radius: 12px; font-size: 1.2rem; resize: vertical; margin-bottom: 20px; background: var(--btn-bg); color: var(--text-primary); }
+    .edit-modal-content textarea { min-height: 200px; }
+    .prompt-modal-content .param-row { margin-bottom: 12px; width: 100%; } .prompt-modal-content .param-row label { font-size: 0.85rem; color: var(--text-secondary); display: block; margin-bottom: 2px; }
+    .prompt-modal-content .param-row input, .prompt-modal-content .param-row textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border-light); border-radius: 8px; background: var(--btn-bg); color: var(--text-primary); font-size: 1rem; }
+    .prompt-modal-content .param-row textarea { min-height: 100px; }
+    .prompt-modal-content .switch-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .prompt-modal-content .switch-group .switch-item { display: flex; align-items: center; justify-content: space-between; background: var(--btn-bg); padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-light); }
+    .prompt-modal-content .row-flex { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; } .prompt-modal-content .row-flex > * { flex: 1 1 120px; }
+    .edit-modal-buttons, .title-modal-buttons, .prompt-modal-buttons { display: flex; gap: 12px; justify-content: center; }
+    .edit-modal-buttons button, .title-modal-buttons button, .prompt-modal-buttons button { padding: 10px 20px; border-radius: 8px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 6px var(--shadow-color); }
+    .edit-save, .title-save, .prompt-save { background: var(--active-bg); color: var(--active-text); border: none; }
     .edit-save:active, .title-save:active, .prompt-save:active { transform: scale(0.96); background: var(--hover-bg); }
-    .edit-cancel, .title-cancel, .prompt-cancel {
-      background: var(--btn-bg);
-      border: 1px solid var(--border-light);
-      color: var(--btn-text);
-    }
+    .edit-cancel, .title-cancel, .prompt-cancel { background: var(--btn-bg); border: 1px solid var(--border-light); color: var(--btn-text); }
     .edit-cancel:active, .title-cancel:active, .prompt-cancel:active { background: var(--hover-bg); }
-    .error-boundary {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #fee2e2;
-      color: #b91c1c;
-      padding: 12px 30px;
-      border-radius: 40px;
-      z-index: 10000;
-      display: none;
-      font-size: 0.9rem;
-      white-space: nowrap;
-    }
+    .error-boundary { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #fee2e2; color: #b91c1c; padding: 12px 30px; border-radius: 40px; z-index: 10000; display: none; font-size: 0.9rem; white-space: nowrap; }
     .error-boundary.show { display: block; }
-    .toast-notification {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--card-bg);
-      color: var(--text-primary);
-      padding: 12px 24px;
-      border-radius: 10px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-      z-index: 10001;
-      font-size: 0.95rem;
-      border: 1px solid var(--border-light);
-      backdrop-filter: blur(10px);
-      transition: opacity 0.3s ease;
-      opacity: 0;
-      pointer-events: none;
-      white-space: nowrap;
-    }
-    .toast-notification.show {
-      opacity: 1;
-    }
+    .toast-notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--card-bg); color: var(--text-primary); padding: 12px 24px; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); z-index: 10001; font-size: 0.95rem; border: 1px solid var(--border-light); backdrop-filter: blur(10px); transition: opacity 0.3s ease; opacity: 0; pointer-events: none; white-space: nowrap; }
+    .toast-notification.show { opacity: 1; }
+    .icon-svg { width: 1.2em; height: 1.2em; vertical-align: middle; position: relative; top: -0.05em; stroke-width: 2; stroke: currentColor; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .send-btn .icon-svg, .prompt-btn .icon-svg { width: 1.4em; height: 1.4em; stroke-width: 1.8; }
+    .glass-radio-group .icon-svg { margin-right: 4px; }
+    .model-refresh-btn .icon-svg { width: 1.2em; height: 1.2em; stroke-width: 2; }
+    .header .icon-svg, .sidebar-header .icon-svg { stroke-width: 2; }
   </style>
 </head>
 <body>
-<div class="toast-notification" id="modelToast"></div>
-<datalist id="fastModelList"></datalist>
-<datalist id="deepModelList"></datalist>
 
+<!-- ========== 图标库（火箭/原子保持原线稿风格，齿轮/花朵/箭头减细） ========== -->
+<svg style="display: none;">
+  <defs>
+    <!-- 火箭（保持用户提供的线稿，仅适配 currentColor） -->
+    <symbol id="icon-rocket" viewBox="0 0 100 100">
+      <path d="M50 14 C 58 24, 62 40, 62 48 L 38 48 C 38 40, 42 24, 50 14 Z" stroke="currentColor" stroke-width="4" stroke-linejoin="round" fill="none"/>
+      <path d="M 38 48 L 34 78 C 34 82, 38 86, 44 86 L 56 86 C 62 86, 66 82, 66 78 L 62 48 Z" stroke="currentColor" stroke-width="4" stroke-linejoin="round" fill="none"/>
+      <path d="M 34 74 L 16 86 L 39 86 Z" stroke="currentColor" stroke-width="4" stroke-linejoin="round" fill="none"/>
+      <path d="M 66 74 L 84 86 L 61 86 Z" stroke="currentColor" stroke-width="4" stroke-linejoin="round" fill="none"/>
+      <path d="M 48 86 L 50 98 L 52 86 Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round" fill="none"/>
+      <circle cx="50" cy="56" r="6" stroke="currentColor" stroke-width="4" fill="none"/>
+      <circle cx="50" cy="56" r="2" fill="currentColor"/>
+      <path d="M 46 86 L 50 98 L 54 86 Z" fill="currentColor" stroke="none"/>
+    </symbol>
+    <!-- 原子（保持用户提供的线稿） -->
+    <symbol id="icon-atom" viewBox="0 0 100 100">
+      <ellipse cx="50" cy="50" rx="38" ry="14" stroke="currentColor" stroke-width="4" fill="none"/>
+      <ellipse cx="50" cy="50" rx="38" ry="14" stroke="currentColor" stroke-width="4" fill="none" transform="rotate(60 50 50)"/>
+      <ellipse cx="50" cy="50" rx="38" ry="14" stroke="currentColor" stroke-width="4" fill="none" transform="rotate(120 50 50)"/>
+      <circle cx="50" cy="50" r="7" fill="currentColor" stroke="none"/>
+    </symbol>
+    <!-- 花朵（减细线条） -->
+    <symbol id="icon-flower" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/>
+      <path d="M12 5v2M12 17v2M5 12h2M17 12h2M7.05 7.05l1.45 1.45M15.5 15.5l1.45 1.45M16.95 7.05l-1.45 1.45M8.5 15.5l-1.45 1.45" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    </symbol>
+    <!-- 齿轮（缩小尺寸并减细线条） -->
+    <symbol id="icon-gear" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="1.8" fill="none"/>
+    </symbol>
+    <!-- 时钟 -->
+    <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="12 6 12 12 16 14" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <!-- 地球 -->
+    <symbol id="icon-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2"/><path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <!-- 钥匙 -->
+    <symbol id="icon-key" viewBox="0 0 24 24"><circle cx="7" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M10 12h11l-2 3 2 3h-3l-2-3" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <!-- 温度计 -->
+    <symbol id="icon-thermometer" viewBox="0 0 24 24"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="11.5" cy="17.5" r="2" fill="currentColor" stroke="none"/></symbol>
+    <!-- 靶心 -->
+    <symbol id="icon-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/></symbol>
+    <!-- 直尺 -->
+    <symbol id="icon-ruler" viewBox="0 0 24 24"><path d="M3 8L8 3l13 13-5 5L3 8z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M8 8l3 3M13 13l3 3" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <!-- 循环（频率惩罚/刷新） -->
+    <symbol id="icon-repeat" viewBox="0 0 24 24">
+      <path d="M17 2l4 4-4 4" stroke="currentColor" stroke-width="2" fill="none"/>
+      <path d="M3 12v-2a4 4 0 0 1 4-4h12" stroke="currentColor" stroke-width="2" fill="none"/>
+      <path d="M7 22l-4-4 4-4" stroke="currentColor" stroke-width="2" fill="none"/>
+      <path d="M21 12v2a4 4 0 0 1-4 4H5" stroke="currentColor" stroke-width="2" fill="none"/>
+    </symbol>
+    <!-- 天平 -->
+    <symbol id="icon-scale" viewBox="0 0 24 24"><path d="M3 6h18M6 6v12M18 6v12M9 9h6M12 9v6" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="9" cy="18" r="1" fill="currentColor"/><circle cx="15" cy="18" r="1" fill="currentColor"/></symbol>
+    <!-- 停止标志 -->
+    <symbol id="icon-stop" viewBox="0 0 24 24"><path d="M12 2L2 7v10l10 5 10-5V7l-10-5z" stroke="currentColor" stroke-width="2" fill="none"/><line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" stroke-width="2"/><line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2"/></symbol>
+    <!-- 文档 -->
+    <symbol id="icon-doc" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none"/><line x1="8" y1="13" x2="16" y2="13" stroke="currentColor" stroke-width="2"/><line x1="8" y1="17" x2="16" y2="17" stroke="currentColor" stroke-width="2"/></symbol>
+    <!-- 闪电 -->
+    <symbol id="icon-bolt" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <!-- 月亮 -->
+    <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <!-- 锁 -->
+    <symbol id="icon-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <!-- 钱袋 -->
+    <symbol id="icon-money" viewBox="0 0 24 24">
+      <path d="M4 8v8c0 2 3 4 8 4s8-2 8-4V8" stroke="currentColor" stroke-width="2" fill="none"/>
+      <path d="M4 8c0-2 3-4 8-4s8 2 8 4" stroke="currentColor" stroke-width="2" fill="none"/>
+      <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2"/>
+      <circle cx="12" cy="10" r="1.5" fill="currentColor"/>
+      <path d="M8 14h8" stroke="currentColor" stroke-width="2"/>
+    </symbol>
+    <!-- 记忆 -->
+    <symbol id="icon-memory" viewBox="0 0 24 24"><path d="M9 12h6M12 9v6" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <!-- 发送箭头（减细） -->
+    <symbol id="icon-arrow-up" viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5" stroke="currentColor" stroke-width="2"/><polyline points="5 12 12 5 19 12" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <!-- 停止方块 -->
+    <symbol id="icon-square" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" fill="currentColor" stroke="none"/></symbol>
+  </defs>
+</svg>
+
+<div class="toast-notification" id="modelToast"></div>
+<datalist id="fastModelList"></datalist><datalist id="deepModelList"></datalist>
 <div class="app" id="app">
   <div class="header">
     <button onclick="window.toggleMenu()">☰</button>
-    <div class="title-container">
-      <h1 id="conversationTitle" onclick="window.editCurrentTitle()">新对话</h1>
-    </div>
-    <button onclick="window.openSettingsPanel()">⚙︎</button>
+    <div class="title-container"><h1 id="conversationTitle" onclick="window.editCurrentTitle()">新对话</h1></div>
+    <button onclick="window.openSettingsPanel()"><svg class="icon-svg" width="24" height="24"><use href="#icon-gear"/></svg></button>
   </div>
-
   <div class="messages" id="messageList"></div>
-
   <div class="bottom-bar">
     <div class="input-card">
       <div class="input-row">
         <textarea id="userInput" placeholder="输入消息..." rows="1"></textarea>
-        <button class="prompt-btn" id="promptBtn" onclick="window.openPromptModal()">✿</button>
+        <button class="prompt-btn" id="promptBtn" onclick="window.openPromptModal()"><svg class="icon-svg" width="24" height="24"><use href="#icon-flower"/></svg></button>
       </div>
       <div class="model-row">
         <div class="glass-radio-group">
           <input type="radio" name="model" id="fastModelRadio" checked>
-          <label for="fastModelRadio">🚀 快速回复</label>
+          <label for="fastModelRadio"><svg class="icon-svg" width="20" height="20"><use href="#icon-rocket"/></svg> 快速回复</label>
           <input type="radio" name="model" id="deepModelRadio">
-          <label for="deepModelRadio">🧠 深度思考</label>
+          <label for="deepModelRadio"><svg class="icon-svg" width="20" height="20"><use href="#icon-atom"/></svg> 深度思考</label>
           <div class="glass-glider"></div>
         </div>
-        <button class="send-btn" id="sendBtn" onclick="window.handleSendOrStop()">⬆︎</button>
+        <button class="send-btn" id="sendBtn" onclick="window.handleSendOrStop()"><svg class="icon-svg" width="26" height="26"><use href="#icon-arrow-up"/></svg></button>
       </div>
     </div>
   </div>
@@ -1477,65 +384,42 @@
 <div class="menu-overlay" id="menuOverlay" onclick="window.toggleMenu()"></div>
 <div class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <h3>🕓 历史对话</h3>
+    <h3><svg class="icon-svg" width="20" height="20"><use href="#icon-clock"/></svg> 历史对话</h3>
   </div>
   <div class="conversation-list" id="conversationList"></div>
   <button class="new-chat-btn" onclick="window.newConversation()">+ 新建对话</button>
 </div>
 
-<!-- 右侧设置遮罩和面板 -->
+<!-- 右侧设置面板 -->
 <div class="overlay" id="settingsOverlay" onclick="window.closeSettingsPanel()"></div>
 <div class="settings-panel" id="settingsPanel">
   <div class="settings-header">
-    <h2>🔅 设置 🔅</h2>
+    <h2>设置</h2>
     <button class="close-btn" onclick="window.closeSettingsPanel()">&times;</button>
   </div>
-  <div class="setting-row">
-    <label>🌐 API 地址</label>
-    <input type="text" id="apiUrl" placeholder="https://api.deepseek.com/v1/chat/completions" value="https://api.deepseek.com/v1/chat/completions">
-  </div>
-  <div class="setting-row">
-    <label>🔑 API 密钥</label>
-    <input type="text" id="apiKey" placeholder="sk-xxxxxxxxxxxxxx">
-  </div>
-  <div class="setting-row">
-    <label>🚀 快速模型</label>
-    <div class="model-refresh-row">
-      <input type="text" id="fastModel" value="deepseek-chat" list="fastModelList" style="flex:1;">
-      <button class="model-refresh-btn" id="refreshFastModel">🔄</button>
-    </div>
-  </div>
-  <div class="setting-row">
-    <label>🧠 深度模型</label>
-    <div class="model-refresh-row">
-      <input type="text" id="deepModel" value="deepseek-reasoner" list="deepModelList" style="flex:1;">
-      <button class="model-refresh-btn" id="refreshDeepModel">🔄</button>
-    </div>
+  <div class="setting-row"><label><svg class="icon-svg" width="16" height="16"><use href="#icon-globe"/></svg> API 地址</label><input type="text" id="apiUrl" placeholder="https://api.deepseek.com/v1/chat/completions" value="https://api.deepseek.com/v1/chat/completions"></div>
+  <div class="setting-row"><label><svg class="icon-svg" width="16" height="16"><use href="#icon-key"/></svg> API 密钥</label><input type="text" id="apiKey" placeholder="sk-xxxxxxxxxxxxxx"></div>
+  <div class="setting-row"><label><svg class="icon-svg" width="16" height="16"><use href="#icon-rocket"/></svg> 快速模型</label><div class="model-refresh-row"><input type="text" id="fastModel" value="deepseek-chat" list="fastModelList" style="flex:1;"><button class="model-refresh-btn" id="refreshFastModel"><svg class="icon-svg" width="16" height="16"><use href="#icon-repeat"/></svg></button></div></div>
+  <div class="setting-row"><label><svg class="icon-svg" width="16" height="16"><use href="#icon-atom"/></svg> 深度模型</label><div class="model-refresh-row"><input type="text" id="deepModel" value="deepseek-reasoner" list="deepModelList" style="flex:1;"><button class="model-refresh-btn" id="refreshDeepModel"><svg class="icon-svg" width="16" height="16"><use href="#icon-repeat"/></svg></button></div></div>
+  <div class="row-flex">
+    <div class="setting-row"><label><svg class="icon-svg" width="16" height="16"><use href="#icon-thermometer"/></svg> 温度</label><input type="number" id="temperature" step="0.1" min="0" max="2" value="0.7"></div>
+    <div class="setting-row"><label><svg class="icon-svg" width="16" height="16"><use href="#icon-target"/></svg> Top P</label><input type="number" id="topP" step="0.05" min="0" max="1" value="1"></div>
   </div>
   <div class="row-flex">
-    <div class="setting-row"><label>🌡️ 温度</label><input type="number" id="temperature" step="0.1" min="0" max="2" value="0.7"></div>
-    <div class="setting-row"><label>🎯 Top P</label><input type="number" id="topP" step="0.05" min="0" max="1" value="1"></div>
+    <div class="setting-row"><label><svg class="icon-svg" width="16" height="16"><use href="#icon-ruler"/></svg> 最大输出值</label><input type="number" id="maxTokens" min="1" value="8192"></div>
+    <div class="setting-row"><label><svg class="icon-svg" width="16" height="16"><use href="#icon-repeat"/></svg> 频率惩罚</label><input type="number" id="frequencyPenalty" step="0.1" min="-2" max="2" value="0"></div>
   </div>
   <div class="row-flex">
-    <div class="setting-row"><label>📏 最大输出值</label><input type="number" id="maxTokens" min="1" value="8192"></div>
-    <div class="setting-row"><label>🔁 频率惩罚</label><input type="number" id="frequencyPenalty" step="0.1" min="-2" max="2" value="0"></div>
+    <div class="setting-row"><label><svg class="icon-svg" width="16" height="16"><use href="#icon-scale"/></svg> 存在惩罚</label><input type="number" id="presencePenalty" step="0.1" min="-2" max="2" value="0"></div>
+    <div class="setting-row"><label><svg class="icon-svg" width="16" height="16"><use href="#icon-stop"/></svg> 停止序列</label><input type="text" id="stop"></div>
   </div>
-  <div class="row-flex">
-    <div class="setting-row"><label>⚖️ 存在惩罚</label><input type="number" id="presencePenalty" step="0.1" min="-2" max="2" value="0"></div>
-    <div class="setting-row"><label>🛑 停止序列</label><input type="text" id="stop"></div>
-  </div>
-  <div class="setting-row">
-    <label>📝 系统提示词</label>
-    <textarea id="systemPrompt" rows="5">你的名字是九方星耀，是一个热情友好的AI助手。当用户问你的名字时，你要回答你叫九方星耀。你回答问题简洁明了。</textarea>
-  </div>
-
+  <div class="setting-row"><label><svg class="icon-svg" width="16" height="16"><use href="#icon-doc"/></svg> 系统提示词</label><textarea id="systemPrompt" rows="5">你的名字是九方星耀，是一个热情友好的AI助手。当用户问你的名字时，你要回答你叫九方星耀。你回答问题简洁明了。</textarea></div>
   <div class="switch-grid">
-    <div class="switch-item"><label for="streamCheckbox">⚡ 流式输出</label><label class="switch-button" for="streamCheckbox"><div class="switch-outer"><input type="checkbox" id="streamCheckbox" checked><div class="button"><span class="button-toggle"></span><span class="button-indicator"></span></div></div></label></div>
-    <div class="switch-item"><label for="darkModeToggle">🌙 深色模式</label><label class="switch-button" for="darkModeToggle"><div class="switch-outer"><input type="checkbox" id="darkModeToggle"><div class="button"><span class="button-toggle"></span><span class="button-indicator"></span></div></div></label></div>
-    <div class="switch-item"><label for="privacyModeToggle">🔒 隐私模式</label><label class="switch-button" for="privacyModeToggle"><div class="switch-outer"><input type="checkbox" id="privacyModeToggle"><div class="button"><span class="button-toggle"></span><span class="button-indicator"></span></div></div></label></div>
-    <div class="switch-item"><label for="economyModeToggle">💰 省钱模式</label><label class="switch-button" for="economyModeToggle"><div class="switch-outer"><input type="checkbox" id="economyModeToggle"><div class="button"><span class="button-toggle"></span><span class="button-indicator"></span></div></div></label></div>
+    <div class="switch-item"><label for="streamCheckbox"><svg class="icon-svg" width="16" height="16"><use href="#icon-bolt"/></svg> 流式输出</label><label class="switch-button" for="streamCheckbox"><div class="switch-outer"><input type="checkbox" id="streamCheckbox" checked><div class="button"><span class="button-toggle"></span><span class="button-indicator"></span></div></div></label></div>
+    <div class="switch-item"><label for="darkModeToggle"><svg class="icon-svg" width="16" height="16"><use href="#icon-moon"/></svg> 深色模式</label><label class="switch-button" for="darkModeToggle"><div class="switch-outer"><input type="checkbox" id="darkModeToggle"><div class="button"><span class="button-toggle"></span><span class="button-indicator"></span></div></div></label></div>
+    <div class="switch-item"><label for="privacyModeToggle"><svg class="icon-svg" width="16" height="16"><use href="#icon-lock"/></svg> 隐私模式</label><label class="switch-button" for="privacyModeToggle"><div class="switch-outer"><input type="checkbox" id="privacyModeToggle"><div class="button"><span class="button-toggle"></span><span class="button-indicator"></span></div></div></label></div>
+    <div class="switch-item"><label for="economyModeToggle"><svg class="icon-svg" width="16" height="16"><use href="#icon-money"/></svg> 省钱模式</label><label class="switch-button" for="economyModeToggle"><div class="switch-outer"><input type="checkbox" id="economyModeToggle"><div class="button"><span class="button-toggle"></span><span class="button-indicator"></span></div></div></label></div>
   </div>
-
   <div class="save-btn-container">
     <button class="animated-button" id="saveSettingsBtn"><svg class="arr-2" viewBox="0 0 24 24"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"/></svg><span class="text" id="buttonText">保存设置</span><span class="circle"></span><svg class="arr-1" viewBox="0 0 24 24"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"/></svg></button>
   </div>
@@ -1546,29 +430,29 @@
 <div class="edit-modal" id="editModal"><div class="edit-modal-content"><h3>编辑消息</h3><textarea id="editMessageContent"></textarea><div class="edit-modal-buttons"><button class="edit-cancel" onclick="window.cancelEdit()">取消</button><button class="edit-save" onclick="window.saveEdit()">保存</button></div></div></div>
 <!-- 修改标题模态框 -->
 <div class="title-modal" id="titleModal"><div class="title-modal-content"><h3>修改对话标题</h3><input type="text" id="titleInput" maxlength="30"><div class="title-modal-buttons"><button class="title-cancel" onclick="window.cancelTitleEdit()">取消</button><button class="title-save" onclick="window.saveTitleEdit()">保存</button></div></div></div>
-<!-- 独立对话参数设置模态框 -->
+<!-- 对话参数设置模态框 -->
 <div class="prompt-modal" id="promptModal">
   <div class="prompt-modal-content">
     <h3>本对话参数设置</h3>
     <div class="switch-group">
-      <div class="switch-item"><label for="dialogEconomyCheckbox">💰 省钱模式</label><label class="switch-button" for="dialogEconomyCheckbox"><div class="switch-outer"><input type="checkbox" id="dialogEconomyCheckbox"><div class="button"><span class="button-toggle"></span><span class="button-indicator"></span></div></div></label></div>
-      <div class="switch-item"><label for="dialogStreamCheckbox">⚡ 流式输出</label><label class="switch-button" for="dialogStreamCheckbox"><div class="switch-outer"><input type="checkbox" id="dialogStreamCheckbox"><div class="button"><span class="button-toggle"></span><span class="button-indicator"></span></div></div></label></div>
-      <div class="switch-item"><label for="dialogMemoryCheckbox">🧠 记忆摘要</label><label class="switch-button" for="dialogMemoryCheckbox"><div class="switch-outer"><input type="checkbox" id="dialogMemoryCheckbox"><div class="button"><span class="button-toggle"></span><span class="button-indicator"></span></div></div></label></div>
+      <div class="switch-item"><label for="dialogEconomyCheckbox"><svg class="icon-svg" width="16" height="16"><use href="#icon-money"/></svg> 省钱模式</label><label class="switch-button" for="dialogEconomyCheckbox"><div class="switch-outer"><input type="checkbox" id="dialogEconomyCheckbox"><div class="button"><span class="button-toggle"></span><span class="button-indicator"></span></div></div></label></div>
+      <div class="switch-item"><label for="dialogStreamCheckbox"><svg class="icon-svg" width="16" height="16"><use href="#icon-bolt"/></svg> 流式输出</label><label class="switch-button" for="dialogStreamCheckbox"><div class="switch-outer"><input type="checkbox" id="dialogStreamCheckbox"><div class="button"><span class="button-toggle"></span><span class="button-indicator"></span></div></div></label></div>
+      <div class="switch-item"><label for="dialogMemoryCheckbox"><svg class="icon-svg" width="16" height="16"><use href="#icon-memory"/></svg> 记忆摘要</label><label class="switch-button" for="dialogMemoryCheckbox"><div class="switch-outer"><input type="checkbox" id="dialogMemoryCheckbox"><div class="button"><span class="button-toggle"></span><span class="button-indicator"></span></div></div></label></div>
     </div>
     <div class="row-flex">
-      <div class="param-row"><label>🌡️ 温度</label><input type="number" id="promptTemp" step="0.1" min="0" max="2"></div>
-      <div class="param-row"><label>🎯 Top P</label><input type="number" id="promptTopP" step="0.05" min="0" max="1"></div>
+      <div class="param-row"><label><svg class="icon-svg" width="14" height="14"><use href="#icon-thermometer"/></svg> 温度</label><input type="number" id="promptTemp" step="0.1" min="0" max="2"></div>
+      <div class="param-row"><label><svg class="icon-svg" width="14" height="14"><use href="#icon-target"/></svg> Top P</label><input type="number" id="promptTopP" step="0.05" min="0" max="1"></div>
     </div>
     <div class="row-flex">
-      <div class="param-row"><label>📏 最大输出值</label><input type="number" id="promptMaxTokens" step="1" min="1"></div>
-      <div class="param-row"><label>🔁 频率惩罚</label><input type="number" id="promptFreqPenalty" step="0.1" min="-2" max="2"></div>
+      <div class="param-row"><label><svg class="icon-svg" width="14" height="14"><use href="#icon-ruler"/></svg> 最大输出值</label><input type="number" id="promptMaxTokens" step="1" min="1"></div>
+      <div class="param-row"><label><svg class="icon-svg" width="14" height="14"><use href="#icon-repeat"/></svg> 频率惩罚</label><input type="number" id="promptFreqPenalty" step="0.1" min="-2" max="2"></div>
     </div>
     <div class="row-flex">
-      <div class="param-row"><label>⚖️ 存在惩罚</label><input type="number" id="promptPresPenalty" step="0.1" min="-2" max="2"></div>
-      <div class="param-row"><label>🛑 停止序列</label><input type="text" id="promptStop"></div>
+      <div class="param-row"><label><svg class="icon-svg" width="14" height="14"><use href="#icon-scale"/></svg> 存在惩罚</label><input type="number" id="promptPresPenalty" step="0.1" min="-2" max="2"></div>
+      <div class="param-row"><label><svg class="icon-svg" width="14" height="14"><use href="#icon-stop"/></svg> 停止序列</label><input type="text" id="promptStop"></div>
     </div>
-    <div class="param-row"><label>📝 系统提示词</label><textarea id="promptInput" rows="6"></textarea></div>
-    <div class="param-row"><label>✏️ 记忆摘要</label><textarea id="summaryInput" rows="6" placeholder="重要信息会自动记录在这里，你也可以手动编辑。"></textarea></div>
+    <div class="param-row"><label><svg class="icon-svg" width="14" height="14"><use href="#icon-doc"/></svg> 系统提示词</label><textarea id="promptInput" rows="6"></textarea></div>
+    <div class="param-row"><label><svg class="icon-svg" width="14" height="14"><use href="#icon-memory"/></svg> 记忆摘要</label><textarea id="summaryInput" rows="6" placeholder="重要信息会自动记录在这里，你也可以手动编辑。"></textarea></div>
     <div class="prompt-modal-buttons"><button class="prompt-cancel" onclick="window.cancelPromptEdit()">取消</button><button class="prompt-save" onclick="window.savePromptEdit()">保存</button></div>
   </div>
 </div>
@@ -1577,6 +461,7 @@
 
 <script>
   (function() {
+    // ---------- 完整业务逻辑 (与之前版本完全一致，未作删减) ----------
     window.onerror = function(msg, url, line) {
       document.getElementById('errorBoundary').classList.add('show');
       setTimeout(() => document.getElementById('errorBoundary').classList.remove('show'), 5000);
@@ -1584,13 +469,10 @@
       return false;
     };
 
-    // ---------- 全局变量 ----------
     window.conversationRequests = {};
-
     let editingMessageId = null;
     let editingMessageRole = null;
     let editingConversationIdForTitle = null;
-
     let conversations = [];
     let currentConversation = {
       id: Date.now().toString(),
@@ -1629,7 +511,6 @@
 
     let privacyMode = false;
     let darkMode = false;
-
     let userScrolling = false;
     let scrollTimer = null;
     let programmaticScroll = false;
@@ -1701,24 +582,16 @@
 
     let useDeepModel = false;
 
-    fastModelRadio.addEventListener('change', function(e) {
-      if (e.target.checked) useDeepModel = false;
-    });
-    deepModelRadio.addEventListener('change', function(e) {
-      if (e.target.checked) useDeepModel = true;
-    });
+    fastModelRadio.addEventListener('change', function(e) { if (e.target.checked) useDeepModel = false; });
+    deepModelRadio.addEventListener('change', function(e) { if (e.target.checked) useDeepModel = true; });
 
-    // 监听省钱模式开关联动记忆摘要
     function bindEconomyAndMemory() {
       const economyChecked = dialogEconomyCheckbox.checked;
-      if (economyChecked && !dialogMemoryCheckbox.checked) {
-        dialogMemoryCheckbox.checked = true;
-      }
+      if (economyChecked && !dialogMemoryCheckbox.checked) dialogMemoryCheckbox.checked = true;
     }
     dialogEconomyCheckbox.addEventListener('change', bindEconomyAndMemory);
-    // 注意：手动改变记忆摘要时不需要联动省钱模式
 
-    // ========== 智能记忆摘要（基于上下文总结，非照搬）==========
+    // ---------- 智能记忆摘要 ----------
     const stopWords = ['的', '了', '呢', '啊', '吧', '吗', '呀', '哦', '嗯', '哈', '嘿'];
     const meaninglessActions = ['打开', '关闭', '开启', '关上', '拿来', '拿去', '走', '来', '去', '吃', '喝', '看', '听', '说', '问'];
     
@@ -1744,9 +617,7 @@
         '心情', '感觉', '觉得', '开心', '难过', '生气', '伤心',
         '约定', '答应', '承诺', '记得', '记住'
       ];
-      for (let kw of importantKeywords) {
-        if (lower.includes(kw)) return true;
-      }
+      for (let kw of importantKeywords) { if (lower.includes(kw)) return true; }
       return false;
     }
 
@@ -1766,12 +637,8 @@
     function completeSentence(sentence, topic) {
       if (!topic) return sentence;
       let lower = sentence.toLowerCase();
-      if (/(期待|希望|想|打算|计划)$/.test(lower)) {
-        return sentence.replace(/(期待|希望|想|打算|计划)$/, `$1 ${topic}`);
-      }
-      if (/很(期待|希望|想)/.test(lower) && !/很(期待|希望|想)(.+)/.test(lower)) {
-        return sentence.replace(/很(期待|希望|想)/, `很$1 ${topic}`);
-      }
+      if (/(期待|希望|想|打算|计划)$/.test(lower)) return sentence.replace(/(期待|希望|想|打算|计划)$/, `$1 ${topic}`);
+      if (/很(期待|希望|想)/.test(lower) && !/很(期待|希望|想)(.+)/.test(lower)) return sentence.replace(/很(期待|希望|想)/, `很$1 ${topic}`);
       return sentence;
     }
 
@@ -1787,9 +654,7 @@
         [/不咋/g, '不怎么'],
         [/忒/g, '太'], [/贼/g, '很']
       ];
-      for (let [pattern, repl] of replacements) {
-        result = result.replace(pattern, repl);
-      }
+      for (let [pattern, repl] of replacements) { result = result.replace(pattern, repl); }
       result = result.replace(/我的/g, '用户的').replace(/我/g, '用户');
       result = result.replace(/\s+/g, ' ').trim();
       return result;
@@ -1799,7 +664,6 @@
       let sentences = text.split(/[。！？!?;；\n]+/).map(s => s.trim()).filter(s => s.length > 2);
       let result = [];
       let topic = getTopicFromHistory(recentHistory);
-      
       for (let sent of sentences) {
         if (!isMeaningfulInfo(sent)) continue;
         let processed = sent;
@@ -1807,9 +671,7 @@
           processed = completeSentence(sent, topic);
         }
         let summary = toFormalSummary(processed, topic);
-        if (summary.length > 3 && !result.includes(summary)) {
-          result.push(summary);
-        }
+        if (summary.length > 3 && !result.includes(summary)) result.push(summary);
       }
       return result.slice(0, 5);
     }
@@ -1818,7 +680,6 @@
       if (!userMessage || userMessage.trim() === '') return;
       const memoryEnabled = currentConversation.memoryEnabled !== undefined ? currentConversation.memoryEnabled : false;
       if (!memoryEnabled) return;
-      
       const userHistory = currentConversation.messages.filter(m => m.role === 'user').slice(-5);
       let currentLines = currentConversation.summary ? currentConversation.summary.split('\n').filter(l => l.trim()) : [];
       let existingSet = new Set();
@@ -1840,7 +701,7 @@
       currentConversation.summary = newLines.join('\n');
     }
 
-    // ---------- 以下为原有功能函数（完整实现，与上一版一致）----------
+    // ---------- 其他辅助函数 ----------
     function markdownToPlainText(markdown) {
       if (!markdown) return '';
       try {
@@ -1854,12 +715,8 @@
       return markdown.replace(/[#*_`~\[\]()]/g, '').trim();
     }
 
-    function isNearBottom() {
-      return messageList.scrollTop + messageList.clientHeight >= messageList.scrollHeight - 50;
-    }
-    function isNearTop() {
-      return messageList.scrollTop <= 50;
-    }
+    function isNearBottom() { return messageList.scrollTop + messageList.clientHeight >= messageList.scrollHeight - 50; }
+    function isNearTop() { return messageList.scrollTop <= 50; }
     function safeScrollToBottom() {
       if (isNearBottom() && !userScrolling) {
         programmaticScroll = true;
@@ -1876,9 +733,7 @@
         setTimeout(() => { programmaticScroll = false; }, 50);
       });
     }
-    function forceScrollToBottomIfUserNotScrolling() {
-      if (!userScrolling) forceScrollToBottom();
-    }
+    function forceScrollToBottomIfUserNotScrolling() { if (!userScrolling) forceScrollToBottom(); }
 
     messageList.addEventListener('scroll', () => {
       if (programmaticScroll) return;
@@ -1906,17 +761,13 @@
       renderedMessageCount += loadCount;
     }
 
-    function generateMessageId() {
-      return Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-    }
+    function generateMessageId() { return Date.now() + '-' + Math.random().toString(36).substr(2, 9); }
     function scrollToBottom() { forceScrollToBottom(); }
-    function updateEmptyState() {
-      emptyState.style.display = currentConversation.messages.length === 0 ? 'flex' : 'none';
-    }
+    function updateEmptyState() { emptyState.style.display = currentConversation.messages.length === 0 ? 'flex' : 'none'; }
 
     function renderConversationList() {
       if (privacyMode) {
-        conversationListEl.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">🔒 隐私模式已开启</div>';
+        conversationListEl.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-secondary);"><svg class="icon-svg" width="18" height="18" style="margin-right:4px;"><use href="#icon-lock"/></svg> 隐私模式已开启</div>`;
         return;
       }
       const pinned = conversations.filter(c => c.pinned);
@@ -2139,9 +990,7 @@
       hideAllActions();
     };
 
-    window.deleteMessage = function(msgId) {
-      handleDeleteMessage(null, msgId);
-    };
+    window.deleteMessage = function(msgId) { handleDeleteMessage(null, msgId); };
 
     function getCurrentTime() {
       const d = new Date();
@@ -2169,11 +1018,7 @@
       const wrapper = createMessageElement(displayRole, content, msgId, time, reasoning);
       messageList.appendChild(wrapper);
       updateEmptyState();
-      if (displayRole === 'user') {
-        forceScrollToBottom();
-      } else {
-        safeScrollToBottom();
-      }
+      if (displayRole === 'user') { forceScrollToBottom(); } else { safeScrollToBottom(); }
       if (saveToHistory) {
         const apiRole = displayRole === 'ai' ? 'assistant' : displayRole;
         const newMsg = { id: msgId, role: apiRole, content, time, reasoning };
@@ -2220,9 +1065,7 @@
       safeScrollToBottom();
     };
 
-    function hideAllActions() {
-      document.querySelectorAll('.message-actions').forEach(el => el.classList.remove('show'));
-    }
+    function hideAllActions() { document.querySelectorAll('.message-actions').forEach(el => el.classList.remove('show')); }
 
     window.cancelEdit = function() {
       editModal.classList.remove('show');
@@ -2236,7 +1079,6 @@
       if (!editingMessageId) return;
       const msgIndex = currentConversation.messages.findIndex(m => m.id === editingMessageId);
       if (msgIndex === -1) return;
-      const oldScrollTop = messageList.scrollTop;
       currentConversation.messages.splice(msgIndex + 1);
       currentConversation.messages[msgIndex].content = newContent;
       delete currentConversation.messages[msgIndex].rendered;
@@ -2249,9 +1091,7 @@
         }
       }
       if (currentConversation.messages[msgIndex].role === 'user') {
-        setTimeout(() => {
-          callAIStream(newContent, useDeepModel, true);
-        }, 50);
+        setTimeout(() => { callAIStream(newContent, useDeepModel, true); }, 50);
       }
       editModal.classList.remove('show');
       editingMessageId = null;
@@ -2261,7 +1101,6 @@
     function handleDeleteMessage(wrapper, msgId) {
       const index = currentConversation.messages.findIndex(m => m.id === msgId);
       if (index === -1) return;
-      const oldScrollTop = messageList.scrollTop;
       currentConversation.messages.splice(index);
       reloadFullConversation();
       if (!privacyMode && isCurrentSaved) {
@@ -2281,9 +1120,7 @@
       hideAllActions();
     }
 
-    window.editCurrentTitle = function() {
-      openTitleEditModal(currentConversation.id);
-    };
+    window.editCurrentTitle = function() { openTitleEditModal(currentConversation.id); };
 
     window.cancelTitleEdit = function() {
       titleModal.classList.remove('show');
@@ -2322,9 +1159,7 @@
       hideAllActions();
     };
 
-    window.cancelPromptEdit = function() {
-      promptModal.classList.remove('show');
-    };
+    window.cancelPromptEdit = function() { promptModal.classList.remove('show'); };
 
     window.savePromptEdit = function() {
       currentConversation.systemPrompt = promptInput.value.trim() || null;
@@ -2391,17 +1226,11 @@
           updateEmptyState();
           scrollToBottom();
         }
-      } else if (id === currentConversation.id && !isCurrentSaved) {
-        // ignore
-      } else {
-        renderConversationList();
-      }
+      } else if (id === currentConversation.id && !isCurrentSaved) {} else { renderConversationList(); }
     }
 
     window.newConversation = function() {
-      if (currentConversation.messages.length > 0 && !isCurrentSaved && !privacyMode) {
-        saveCurrentConversation();
-      }
+      if (currentConversation.messages.length > 0 && !isCurrentSaved && !privacyMode) saveCurrentConversation();
       currentConversation = {
         id: Date.now().toString(),
         title: '新对话',
@@ -2425,11 +1254,12 @@
     };
 
     window.updateSendButton = function() {
+      const svg = sendBtn.querySelector('svg use');
       if (window.isGenerating) {
-        sendBtn.textContent = '■';
+        svg.setAttribute('href', '#icon-square');
         sendBtn.classList.add('stop');
       } else {
-        sendBtn.textContent = '⬆︎';
+        svg.setAttribute('href', '#icon-arrow-up');
         sendBtn.classList.remove('stop');
       }
     };
@@ -2444,23 +1274,13 @@
     };
 
     window.handleSendOrStop = function() {
-      if (window.isGenerating) {
-        window.stopGeneration();
-      } else {
-        window.sendMessage();
-      }
+      if (window.isGenerating) window.stopGeneration();
+      else window.sendMessage();
       userInput.blur();
     };
 
-    window.setFastModel = function() {
-      fastModelRadio.checked = true;
-      useDeepModel = false;
-    };
-
-    window.setDeepModel = function() {
-      deepModelRadio.checked = true;
-      useDeepModel = true;
-    };
+    window.setFastModel = function() { fastModelRadio.checked = true; useDeepModel = false; };
+    window.setDeepModel = function() { deepModelRadio.checked = true; useDeepModel = true; };
 
     window.toggleMenu = function() {
       sidebar.classList.toggle('open');
@@ -2497,11 +1317,7 @@
     function applyDarkMode(isDark) {
       darkMode = isDark;
       let meta = document.querySelector('meta[name="theme-color"]');
-      if (!meta) {
-        meta = document.createElement('meta');
-        meta.name = 'theme-color';
-        document.head.appendChild(meta);
-      }
+      if (!meta) { meta = document.createElement('meta'); meta.name = 'theme-color'; document.head.appendChild(meta); }
       meta.content = isDark ? '#000000' : '#ffffff';
       requestAnimationFrame(() => {
         if (isDark) {
@@ -2516,10 +1332,7 @@
       });
     }
 
-    function applyPrivacyMode(isPrivacy) {
-      privacyMode = isPrivacy;
-      renderConversationList();
-    }
+    function applyPrivacyMode(isPrivacy) { privacyMode = isPrivacy; renderConversationList(); }
 
     window.saveSettings = function() {
       try {
@@ -2577,9 +1390,7 @@
             saveSettingsBtn.classList.remove('success');
           }, 2000);
         }
-      } catch (e) {
-        showToast('❌ 保存失败: ' + e.message);
-      }
+      } catch (e) { showToast('❌ 保存失败: ' + e.message); }
     };
 
     if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', window.saveSettings);
@@ -2695,10 +1506,7 @@
       let need = maxHistoryRounds * 2;
       let start = Math.max(0, history.length - need);
       let recent = history.slice(start);
-      while (recent.length > 0 && recent[0].role !== 'user') {
-        start = Math.max(0, start - 1);
-        recent = history.slice(start);
-      }
+      while (recent.length > 0 && recent[0].role !== 'user') { start = Math.max(0, start - 1); recent = history.slice(start); }
       messages.push(...recent.map(m => ({ role: m.role, content: m.content })));
       messages.push({ role: 'user', content: userMessage });
       return messages;
@@ -2752,7 +1560,6 @@
       }
 
       const aiMsgId = generateMessageId();
-
       const loadingDiv = document.createElement('div');
       loadingDiv.className = 'ai-loading';
       loadingDiv.innerHTML = `<div id="wifi-loader"><svg class="circle-outer" viewBox="0 0 86 86"><circle class="back" cx="43" cy="43" r="40"></circle><circle class="front" cx="43" cy="43" r="40"></circle><circle class="new" cx="43" cy="43" r="40"></circle></svg><svg class="circle-middle" viewBox="0 0 60 60"><circle class="back" cx="30" cy="30" r="27"></circle><circle class="front" cx="30" cy="30" r="27"></circle></svg><svg class="circle-inner" viewBox="0 0 34 34"><circle class="back" cx="17" cy="17" r="14"></circle><circle class="front" cx="17" cy="17" r="14"></circle></svg><div class="text" data-text="九方星耀正在思考中"></div></div>`;
