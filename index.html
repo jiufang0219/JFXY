@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>九方星耀 · JF 0.0.12.12(终)</title>
+  <title>九方星耀 · JF 0.0.12.12（终）</title>
   <!-- 开源简体中文正楷字体：霞鹜文楷 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,7 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
   <meta name="theme-color" content="#ffffff">
   <style id="theme-style">
-    /* ===== 主题变量 ===== */
+    /* ===== 主题变量 (无预设，仅定义) ===== */
     :root {
       --bg-body: #e9ecef;
       --bg-app: #ffffff;
@@ -115,6 +115,7 @@
       background: var(--bg-app);
       transition: background-color 0.25s ease;
     }
+    /* 颜色过渡仅用于主题色 */
     .header, .messages, .input-card, .sidebar, .settings-panel, .conv-item, .msg, .setting-row input,
     .setting-row textarea, .switch-item, .model-refresh-btn, .close-btn, .action_btn, .glass-radio-group,
     .prompt-btn, .send-btn, .conv-title, .msg-time, .system, .retry-btn, .empty-state, .toast-notification,
@@ -144,10 +145,6 @@
       justify-content: center;
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(0,0,0,0.21);
-      will-change: transform;
-    }
-    @media (prefers-reduced-motion: no-preference) {
-      .header button { transition: transform 0.2s cubic-bezier(0.23,1,0.32,1), background 0.2s; }
     }
     .header button:active { background: var(--hover-bg); transform: scale(0.94); box-shadow: 0 2px 6px var(--shadow-color); }
     .header .title-container { display: flex; align-items: center; flex: 1; justify-content: center; min-width: 0; }
@@ -174,11 +171,8 @@
     .message-wrapper.ai { max-width: 100%; width: 100%; align-self: flex-start; }
     .msg {
       padding: 12px 16px; line-height: 1.5; word-break: break-word; white-space: pre-wrap;
-      will-change: transform, opacity;
     }
-    @media (prefers-reduced-motion: no-preference) {
-      .msg { animation: msgFadeIn 0.2s ease; }
-    }
+    /* 已删除消息入场动画 */
     .msg.user {
       background: var(--user-msg-bg); color: var(--user-msg-text); border-radius: 14px;
       border-bottom-right-radius: 4px; box-shadow: 0 4px 10px var(--shadow-color); font-size: 18px;
@@ -215,8 +209,7 @@
       align-self: center; box-shadow: 0 2px 6px var(--shadow-color);
     }
     .retry-btn:active { background: var(--hover-bg); transform: scale(0.96); }
-    @keyframes msgFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    /* 思考动画 */
+    /* 思考动画保留 */
     .ai-loading {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       width: 100%; margin: 8px 0; min-height: 100px;
@@ -288,7 +281,7 @@
     @keyframes has-saved-line-bottom { 33.333% { transform: rotate(0deg) translate(1px,2px) scale(var(--zoom-from)); d: path("M 17 20 L 17 13 L 7 13 L 7 20"); } 66.666% { transform: rotate(20deg) translate(2px,-2px) scale(var(--zoom-via)); } 99.999% { transform: rotate(0deg) translate(0px,0px) scale(var(--zoom-to)); d: path("M 17 21 L 17 21 L 7 21 L 7 21"); } }
     @keyframes has-saved-line-bottom-2 { from { d: path("M 17 21 L 17 21 L 7 21 L 7 21"); } to { transform: rotate(0deg) translate(0px,0px) scale(var(--zoom-to)); d: path("M 17 20 L 17 13 L 7 13 L 7 20"); fill: white; } }
     @keyframes has-saved { 33.333% { transform: rotate(0deg) translate(1px,2px) scale(var(--zoom-from)); } 66.666% { transform: rotate(20deg) translate(2px,-2px) scale(var(--zoom-via)); } 99.999% { transform: rotate(0deg) translate(0px,0px) scale(var(--zoom-to)); } }
-    /* 侧边栏与设置面板动画 */
+    /* 侧边栏与设置面板动画 (保留) */
     .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: transparent; z-index: 1999; display: none; }
     .menu-overlay.show { display: block; }
     .sidebar {
@@ -793,10 +786,24 @@
 
 <script>
   (function() {
-    // 版本号与免责声明键
+    // 版本号与免责声明键 (固定版本 JF 0.0.12.12)
     const APP_VERSION = '0.0.12.12';
     const DISCLAIMER_KEY = 'disclaimer_agreed_version';
     
+    // 防止初始加载闪现：预先设置深色模式状态
+    (function preloadTheme() {
+      const savedSettings = localStorage.getItem('dual_model_settings');
+      if (savedSettings) {
+        try {
+          const cfg = JSON.parse(savedSettings);
+          if (cfg.darkMode) {
+            document.documentElement.classList.add('dark-theme');
+            document.querySelector('meta[name="theme-color"]').content = '#000000';
+          }
+        } catch(e) {}
+      }
+    })();
+
     // ---------- 全局错误捕获 ----------
     window.onerror = function(msg, url, line) {
       document.getElementById('errorBoundary').classList.add('show');
@@ -1597,6 +1604,9 @@
       renderConversationList();
       updateEmptyState();
       scrollToBottom();
+      // 新建对话时自动收起侧边栏
+      sidebar.classList.remove('open');
+      menuOverlay.classList.remove('show');
     };
 
     window.updateSendButton = function() {
@@ -1928,6 +1938,20 @@
           const decoder = new TextDecoder('utf-8');
           let buffer = '', fullContent = '', reasoningContent = '', isFirstChunk = true;
           let reasoningBlock = null, reasoningHeader = null, reasoningContentDiv = null;
+          let pendingUpdate = false;
+          let rafId = null;
+
+          const updateContent = () => {
+            if (!convId || convId !== currentConversation.id) return;
+            const aiMsgDiv = aiWrapper.querySelector('.msg.ai');
+            if (aiMsgDiv) {
+              if (typeof marked !== 'undefined') aiMsgDiv.innerHTML = marked.parse(fullContent);
+              else aiMsgDiv.innerHTML = fullContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+              safeScrollToBottom();
+            }
+            pendingUpdate = false;
+            rafId = null;
+          };
 
           while (true) {
             const { done, value } = await reader.read();
@@ -1978,19 +2002,17 @@
                     }
                     fullContent += contentDelta;
                     req.partialContent = fullContent;
-                    if (convId === currentConversation.id) {
-                      const aiMsgDiv = aiWrapper.querySelector('.msg.ai');
-                      if (aiMsgDiv) {
-                        if (typeof marked !== 'undefined') aiMsgDiv.innerHTML = marked.parse(fullContent);
-                        else aiMsgDiv.innerHTML = fullContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
-                        safeScrollToBottom();
-                      }
+                    if (!pendingUpdate) {
+                      pendingUpdate = true;
+                      rafId = requestAnimationFrame(updateContent);
                     }
                   }
                 } catch (e) {}
               }
             }
           }
+          if (rafId) cancelAnimationFrame(rafId);
+          updateContent();
 
           const aiMsgDiv = aiWrapper.querySelector('.msg.ai');
           if (fullContent === '') {
